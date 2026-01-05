@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.name }} - Project Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/project_detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/add_task_modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_task_modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/material_modal.css') }}">
+    <script src="{{ url_for('static', filename='js/modals/add_task_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/edit_task_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/add_material_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/edit_material_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-flex-container">
+                <div></div>
+                <a href="/projects" class="back-arrow" title="Back to Projects">✕</a>
+            </div>
+            <h1 class="project-title">{{ project.name }}</h1>
+            <div class="project-id">Project ID: {{ project.id }}</div>
+        </div>
+
+        <div class="project-details">
+            <div class="detail-section">
+                <div class="detail-label">Name</div>
+                <div class="detail-value">{{ project.name }}</div>
+            </div>
+
+            <div class="detail-section description-section">
+                <div class="detail-label">Description</div>
+                <div class="detail-value">
+                    {% if project.description %}
+                        <div class="description-text">{{ project.description }}</div>
+                    {% else %}
+                        <div class="no-description">No description provided.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-label">Created At</div>
+                <div class="detail-value timestamp">{{ project.created_at.strftime('%b %d %Y at %-I:%M %p') }}</div>
+            </div>
+
+            
+            <div class="detail-section">
+                <div class="detail-label">Start Date</div>
+                <div class="detail-value">
+                    {% if project.start_date %}
+                        {{ project.start_date.strftime('%b %d %Y at %-I:%M %p') }}
+                    {% else %}
+                        <em>Start Date Undetermined</em>
+                    {% endif %}
+                </div>
+            </div>
+  
+
+            <div class="detail-section">
+                <div class="detail-label">End Date</div>
+                <div class="detail-value">
+                    {% if project.end_date %}
+                        {{ project.end_date.strftime('%b %d %Y at %-I:%M %p') }}
+                    {% else %}
+                        <em>End Date Undetermined</em>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-label">Status</div>
+                <div class="detail-value">
+                    {% if project.is_complete %}
+                        <span class="status-badge completed">✓ Completed</span>
+                    {% else %}
+                        <span class="status-badge active">In Progress</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-section materials-section">
+                <div class="materials-header">
+                    <div class="materials-title">Materials ({{ project.materials|length }})</div>
+                    <button class="add-material-btn" onclick="openMaterialModal()">Add Material</button>
+                </div>
+
+                <div class="materials-list">
+                    {% if project.materials %}
+                        <table class="materials-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for material in project.materials %}
+                                    <tr class="material-row">
+                                        <td class="material-name-cell">
+                                            <a href="/material/{{ material.id }}" class="material-link">{{ material.name }}</a>
+                                        </td>
+                                        <td class="material-description-cell">
+                                            {% if material.description %}
+                                                {{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}
+                                            {% else %}
+                                                <em>No description</em>
+                                            {% endif %}
+                                        </td>
+                                        <td class="material-price-cell">
+                                            {% if material.price %}
+                                                ${{ "%.2f"|format(material.price) }}
+                                            {% else %}
+                                                <em>N/A</em>
+                                            {% endif %}
+                                        </td>
+                                        <td class="material-action-cell">
+                                            <button type="button" onclick="openEditMaterialModal({{ material.id }}, '{{ material.name }}', '{{ material.description or '' }}', {{ material.price or 'null' }}, '{{ material.link or '' }}', '{{ material.specification_notes or '' }}', {{ material.tags|map(attribute='id')|list|tojson }})" class="edit-material-btn">Edit</button>
+                                            <form action="/project/{{ project.id }}/remove_material/{{ material.id }}" method="POST" class="remove-material-form">
+                                                <button type="submit" class="remove-material-btn" onclick="return confirm('Remove this material from the project?')">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="materials-summary">
+                            <div class="materials-summary-row">
+                                <span class="materials-summary-label">Material Count:</span>
+                                <span class="materials-summary-value">
+                                    {{ project.materials|length }}
+                                </span>
+                            </div>
+                            <div class="materials-summary-row">
+                                <span class="materials-summary-total-label">Total Materials Cost:</span>
+                                <span class="materials-summary-total-value">
+                                    {% set total = project.materials|sum(attribute='price', start=0) %}
+                                    ${{ "%.2f"|format(total) }}
+                                </span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-materials">
+                            <p>No materials assigned to this project yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="detail-section tasks-section">
+                <div class="tasks-header">
+                    <div class="tasks-title">Tasks ({{ project.tasks|length }})</div>
+                    <div class="tasks-header-flex">
+                        <label class="toggle-completed-label">
+                            <input type="checkbox" id="toggleCompletedTasks" class="toggle-completed-checkbox" onchange="toggleCompletedTasks()">
+                            Show completed tasks
+                        </label>
+                        <button class="add-task-btn" onclick="openTaskModal()">Add Task</button>
+                    </div>
+                </div>
+
+                <div class="tasks-list">
+                    {% if project.tasks %}
+                        {% for task in project.tasks %}
+                            <div class="task-card" data-completed="{{ task.is_completed|lower }}">
+                                <div class="task-name"><span class="task-order-number">#{{ task.order }}</span>{{ task.name }}</div>
+                                <div class="task-description">
+                                    {% if task.description %}
+                                        {{ task.description }}
+                                    {% else %}
+                                        <em>No description</em>
+                                    {% endif %}
+                                </div>
+                                <div class="task-details">
+                                    {% if task.difficulty %}
+                                        <span class="task-difficulty difficulty-{{ task.difficulty.lower().replace(' ', '-') }}">{{ task.difficulty }}</span>
+                                    {% endif %}
+                                    {% if task.completion_percentage %}
+                                        <span class="task-completion">{{ task.completion_percentage }}% complete</span>
+                                    {% endif %}
+                                    {% if task.is_completed %}
+                                        <span class="task-status completed">✓ Completed</span>
+                                    {% else %}
+                                        <span class="task-status pending">In Progress</span>
+                                    {% endif %}
+                                </div>
+                                <div class="task-dates">
+                                    {% if task.start_date %}
+                                        <div class="task-date">Start: {{ task.start_date.strftime('%b %d %Y at %-I:%M %p') }}</div>
+                                    {% endif %}
+                                    {% if task.end_date %}
+                                        <div class="task-date">End: {{ task.end_date.strftime('%b %d %Y at %-I:%M %p') }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="task-meta">Created: {{ task.created_at.strftime('%b %d %Y at %-I:%M %p') }}</div>
+                                <div class="task-actions-inline">
+                                    <button type="button" onclick="openEditTaskModal({{ task.id }}, '{{ task.name }}', '{{ task.description or '' }}', {{ task.is_completed|lower }}, '{{ task.start_date.strftime('%Y-%m-%d') if task.start_date else '' }}', '{{ task.end_date.strftime('%Y-%m-%d') if task.end_date else '' }}', '{{ task.difficulty or '' }}', {{ task.completion_percentage or 0 }})" class="edit-task-btn edit-task-btn-inline">Edit</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-tasks">
+                            No tasks yet. Click "Add Task" to create your first task for this project.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/edit-project/{{ project.id }}" class="action-btn edit-btn">Edit Project</a>
+            <button onclick="confirmDelete()" class="action-btn delete-btn">Delete Project</button>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" onmousedown="if(event.target.id === 'addTaskModal') closeAddTaskModal();">
+        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeAddTaskModal()">&times;</span>
+            <h2>Add New Task</h2>
+            
+            <!-- Create Task Form -->
+            <form id="createTaskForm" action="/tasks" method="POST">
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                <div>
+                    <label for="task_name">Task Name</label>
+                    <input type="text" id="task_name" name="name" required>
+                </div>
+                <div>
+                    <label for="task_description">Description</label>
+                    <textarea id="task_description" name="description"></textarea>
+                </div>
+                <div>
+                    <label for="task_start_date">Start Date</label>
+                    <input type="date" id="task_start_date" name="start_date">
+                </div>
+                <div>
+                    <label for="task_end_date">End Date</label>
+                    <input type="date" id="task_end_date" name="end_date">
+                </div>
+                <div>
+                    <label>Difficulty</label>
+                    <input type="hidden" id="task_difficulty" name="difficulty" value="">
+                    <div class="difficulty-grid">
+                        <button type="button" class="difficulty-btn" data-difficulty="Easy" onclick="selectDifficulty('Easy')">Easy</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Medium" onclick="selectDifficulty('Medium')">Medium</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Hard" onclick="selectDifficulty('Hard')">Hard</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Very Hard" onclick="selectDifficulty('Very Hard')">Very Hard</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="task_completion_percentage">Completion Percentage (%)</label>
+                    <select id="task_completion_percentage" name="completion_percentage">
+                        <option value="0">0%</option>
+                        <option value="10">10%</option>
+                        <option value="25">25%</option>
+                        <option value="50">50%</option>
+                        <option value="75">75%</option>
+                        <option value="90">90%</option>
+                        <option value="100">100%</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="task-checkbox-label">
+                        <input type="checkbox" id="task_is_completed" name="is_completed">
+                        Mark as completed
+                    </label>
+                </div>
+                <button type="submit">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" onmousedown="if(event.target.id === 'editTaskModal') closeEditTaskModal();">
+        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeEditTaskModal()">&times;</span>
+            <h2>Edit Task</h2>
+            
+            <!-- Edit Task Form -->
+            <form id="editTaskForm">
+                <input type="hidden" id="edit_task_id">
+                <div>
+                    <label for="edit_task_name">Task Name</label>
+                    <input type="text" id="edit_task_name" required>
+                </div>
+                <div>
+                    <label for="edit_task_description">Description</label>
+                    <textarea id="edit_task_description"></textarea>
+                </div>
+                <div>
+                    <label for="edit_task_start_date">Start Date</label>
+                    <input type="date" id="edit_task_start_date">
+                </div>
+                <div>
+                    <label for="edit_task_end_date">End Date</label>
+                    <input type="date" id="edit_task_end_date">
+                </div>
+                <div>
+                    <label>Difficulty</label>
+                    <input type="hidden" id="edit_task_difficulty" value="">
+                    <div class="difficulty-grid">
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Easy" onclick="selectEditDifficulty('Easy')">Easy</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Medium" onclick="selectEditDifficulty('Medium')">Medium</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Hard" onclick="selectEditDifficulty('Hard')">Hard</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Very Hard" onclick="selectEditDifficulty('Very Hard')">Very Hard</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="edit_task_completion_percentage">Completion Percentage (%)</label>
+                    <select id="edit_task_completion_percentage">
+                        <option value="0">0%</option>
+                        <option value="10">10%</option>
+                        <option value="25">25%</option>
+                        <option value="50">50%</option>
+                        <option value="75">75%</option>
+                        <option value="90">90%</option>
+                        <option value="100">100%</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="edit_task_is_completed">
+                        Mark as completed
+                    </label>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Save Changes</button>
+                    <button type="button" class="cancel-btn" onclick="closeEditTaskModal();">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Material Selection Modal -->
+    <div id="materialModal" onmousedown="if(event.currentTarget === event.target) closeMaterialModal();">
+        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeMaterialModal()">&times;</span>
+            <h2 id="materialModalTitle">Add Material to Project</h2>
+
+            <!-- Tab Navigation -->
+            <div class="material-modal-tabs">
+                <button id="searchTab" class="tab-button active" onclick="showMaterialTab('search')">Search Materials</button>
+                <button id="createTab" class="tab-button" onclick="showMaterialTab('create')">Create New Material</button>
+            </div>
+
+            <!-- Search Tab Content -->
+            <div id="searchContent" class="tab-content">
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="materialSearch" class="tab-content" placeholder="Search materials...">
+                </div>
+                <div id="materialsList">
+                    {% for material in materials %}
+                        {% if material not in project.materials %}
+                            <div class="material-item" data-name="{{ material.name.lower() }}" data-description="{{ material.description|lower if material.description else '' }}">
+                                <div>
+                                    <div class="material-item-name">{{ material.name }}</div>
+                                    <div class="material-item-description">
+                                        {% if material.description %}
+                                            {{ material.description }}
+                                        {% else %}
+                                            No description
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <form action="/project/{{ project.id }}/add_material/{{ material.id }}" method="POST">
+                                    <button type="submit">Add</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if not materials %}
+                        <p class="no-materials">No materials available to add.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Create Tab Content -->
+            <div id="createContent" class="tab-content">
+                <form action="/materials" method="POST">
+                    <input type="hidden" name="project_id" value="{{ project.id }}">
+                    <div>
+                        <label for="material_name">Material Name</label>
+                        <input type="text" id="material_name" name="name" required>
+                    </div>
+                    <div>
+                        <label for="material_description">Description</label>
+                        <textarea id="material_description" name="description"></textarea>
+                    </div>
+                    <div>
+                        <label for="material_price">Price ($)</label>
+                        <input type="number" id="material_price" name="price" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label for="material_link">Link/URL</label>
+                        <input type="url" id="material_link" name="link" placeholder="https://example.com">
+                    </div>
+                    <div>
+                        <label for="material_specification_notes">Specification Notes</label>
+                        <textarea id="material_specification_notes" name="specification_notes"></textarea>
+                    </div>
+                    <div>
+                        <label>Tags</label>
+                        
+                        <div class="tag-creation-container">
+                            <div>
+                                <label class="tag-creation-label">Create New Tag</label>
+                                <input type="text" id="new_tag_name" class="tag-creation-input" placeholder="Tag name (e.g., 'Urgent', 'Electronics')">
+                                <div class="tag-creation-grid">
+                                    <div class="tag-creation-color-container">
+                                        <label class="tag-creation-color-label">Color</label>
+                                        <input type="color" id="new_tag_color" class="tag-creation-color" value="#667eea">
+                                    </div>
+                                    <div class="tag-creation-button-container">
+                                        <button type="button" id="create-tag-btn" class="tag-create-btn">Create Tag</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tags-list" class="tags-list">
+                            {% if tags %}
+                                {% for tag in tags %}
+                                    <label>
+                                        <input type="checkbox" name="tags" value="{{ tag.id }}">
+                                        <span class="tag-badge" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                    </label>
+                                {% endfor %}
+                            {% else %}
+                                <p class="no-tags">No tags available. Create one above!</p>
+                            {% endif %}
+                        </div>
+                        <div id="new-tags-container"></div>
+                    </div>
+                    
+                    <div class="contact-section">
+                        <label class="contact-option-label">Associated Contact (Optional)</label>
+                        <div>
+                            <label class="contact-option-small-label">Choose an option:</label>
+                            <select id="contact_option" class="contact-option-select" onchange="handleContactOption()">
+                                <option value="none">None</option>
+                                <option value="select">Select Existing Contact</option>
+                                <option value="create">Create New Contact</option>
+                            </select>
+                        </div>
+                        <div id="select_contact_div">
+                            <select id="existing_contact_id" name="contact_id" class="contact-option-select">
+                                <option value="">-- Select a contact --</option>
+                                {% for contact in contacts %}
+                                    <option value="{{ contact.id }}">{{ contact.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="create_contact_div">
+                            <div>
+                                <label class="contact-option-small-label">Name</label>
+                                <input type="text" id="new_contact_name" class="contact-input" name="new_contact_name" placeholder="Contact name">
+                            </div>
+                            <div>
+                                <label class="contact-option-small-label">Email</label>
+                                <input type="email" id="new_contact_email" class="contact-input" name="new_contact_email" placeholder="Email address">
+                            </div>
+                            <div>
+                                <label class="contact-option-small-label">Phone</label>
+                                <input type="tel" id="new_contact_phone" class="contact-input" name="new_contact_phone" placeholder="Phone number">
+                            </div>
+                            <div>
+                                <label class="contact-checkbox-label">
+                                    <input type="checkbox" id="new_contact_is_store" name="new_contact_is_store">
+                                    This is a store/supplier
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="material-submit-btn">Create & Add to Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Material Modal -->
+    <div id="editMaterialModal" onmousedown="if(event.currentTarget === event.target) closeEditMaterialModal();">
+        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeEditMaterialModal()">&times;</span>
+            <h2>Edit Material</h2>
+
+            <form id="editMaterialForm">
+                <input type="hidden" id="editMaterialId" name="material_id">
+                <div>
+                    <label for="edit_material_name">Material Name</label>
+                    <input type="text" id="edit_material_name" name="name" required>
+                </div>
+                <div>
+                    <label for="edit_material_description">Description</label>
+                    <textarea id="edit_material_description" name="description"></textarea>
+                </div>
+                <div>
+                    <label for="edit_material_price">Price ($)</label>
+                    <input type="number" id="edit_material_price" name="price" step="0.01" min="0">
+                </div>
+                <div>
+                    <label for="edit_material_link">Link/URL</label>
+                    <input type="url" id="edit_material_link" name="link" placeholder="https://example.com">
+                </div>
+                <div>
+                    <label for="edit_material_specification_notes">Specification Notes</label>
+                    <textarea id="edit_material_specification_notes" name="specification_notes"></textarea>
+                </div>
+                <div>
+                    <label>Tags</label>
+                    
+                    <div class="tag-creation-container">
+                        <div>
+                            <label class="tag-creation-label">Create New Tag</label>
+                            <input type="text" id="edit_new_tag_name" class="tag-creation-input" placeholder="Tag name (e.g., 'Urgent', 'Electronics')">
+                            <div class="tag-creation-grid">
+                                <div class="tag-creation-color-container">
+                                    <label class="tag-creation-color-label">Color</label>
+                                    <input type="color" id="edit_new_tag_color" class="tag-creation-color" value="#667eea">
+                                </div>
+                                <div class="tag-creation-button-container">
+                                    <button type="button" id="edit_create-tag-btn" class="tag-create-btn">Create Tag</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="edit_tags-list" class="tags-list">
+                        {% if tags %}
+                            {% for tag in tags %}
+                                <label>
+                                    <input type="checkbox" name="edit_tags" value="{{ tag.id }}">
+                                    <span class="tag-badge" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                </label>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-tags">No tags available. Create one above!</p>
+                        {% endif %}
+                    </div>
+                    <div id="edit_new-tags-container"></div>
+                </div>
+                <div class="material-button-group">
+                    <button type="submit">Save Changes</button>
+                    <button type="button" onclick="closeEditMaterialModal();">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let newTags = {};
+        
+        document.getElementById('create-tag-btn').addEventListener('click', function() {
+            const tagName = document.getElementById('new_tag_name').value.trim();
+            const tagColor = document.getElementById('new_tag_color').value;
+            
+            if (!tagName) {
+                alert('Please enter a tag name');
+                return;
+            }
+            
+            // Check if tag already exists in the existing tags list
+            const existingCheckboxes = document.querySelectorAll('#tags-list input[type="checkbox"]');
+            for (let checkbox of existingCheckboxes) {
+                const label = checkbox.closest('label');
+                const tagSpan = label.querySelector('span');
+                if (tagSpan.textContent === tagName) {
+                    // Tag exists, just check it
+                    checkbox.checked = true;
+                    document.getElementById('new_tag_name').value = '';
+                    document.getElementById('new_tag_color').value = '#667eea';
+                    alert(`Tag "${tagName}" already exists and has been selected.`);
+                    return;
+                }
+            }
+            
+            // Check if tag already exists in new tags
+            for (let tagId in newTags) {
+                if (newTags[tagId].name === tagName) {
+                    alert(`Tag "${tagName}" has already been created in this form.`);
+                    return;
+                }
+            }
+            
+            // Create new tag
+            const tagId = 'new_' + Object.keys(newTags).length;
+            newTags[tagId] = { name: tagName, color: tagColor };
+            
+            const container = document.getElementById('new-tags-container');
+            const label = document.createElement('label');
+            label.style.cssText = 'display: flex; align-items: center; color: #e0e0e0; cursor: pointer; margin: 0; padding: 10px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px;';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'tags';
+            checkbox.value = tagId;
+            checkbox.checked = true;
+            checkbox.style.cssText = 'margin-right: 10px; cursor: pointer; width: 18px; height: 18px;';
+            
+            const span = document.createElement('span');
+            span.textContent = tagName;
+            span.style.cssText = `padding: 4px 12px; border-radius: 20px; color: white; font-size: 0.9em; background-color: ${tagColor};`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = '✕';
+            removeBtn.style.cssText = 'margin-left: auto; background: rgba(255, 255, 255, 0.2); color: #ff6b6b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 14px;';
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                label.remove();
+                delete newTags[tagId];
+            });
+            
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            label.appendChild(removeBtn);
+            container.appendChild(label);
+            
+            document.getElementById('new_tag_name').value = '';
+            document.getElementById('new_tag_color').value = '#667eea';
+        });
+        
+        // Handle form submission to include new tags data
+        const form = document.querySelector('form[action="/materials"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Add hidden inputs for new tags
+                Object.keys(newTags).forEach(function(tagId) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'new_tags[]';
+                    input.value = JSON.stringify({id: tagId, name: newTags[tagId].name, color: newTags[tagId].color});
+                    form.appendChild(input);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

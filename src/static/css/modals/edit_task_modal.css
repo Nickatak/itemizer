@@ -1,0 +1,161 @@
+/* Edit Task Modal Styles */
+
+#editTaskModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#editTaskModal > div {
+    background: rgba(15, 15, 35, 0.95);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#editTaskModal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+#editTaskModal .close:hover {
+    color: #ffffff;
+}
+
+#editTaskModal h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+#editTaskForm div {
+    margin-bottom: 20px;
+}
+
+#editTaskForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+#editTaskForm input[type="text"],
+#editTaskForm input[type="date"],
+#editTaskForm textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+
+#editTaskForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#editTaskForm select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+
+#editTaskForm select option {
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+
+#editTaskForm .difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.edit-difficulty-btn {
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.edit-difficulty-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+#editTaskForm .checkbox-label {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+#editTaskForm input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+#editTaskForm .button-group {
+    display: flex;
+    gap: 10px;
+}
+
+#editTaskForm button[type="submit"] {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    flex: 1;
+    transition: all 0.3s;
+}
+
+#editTaskForm button[type="submit"]:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+#editTaskForm button[type="button"].cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    flex: 1;
+    transition: all 0.3s;
+}
+
+#editTaskForm button[type="button"].cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

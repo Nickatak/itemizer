@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts - Itemizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts.css') }}">
+    <script src="{{ url_for('static', filename='js/contacts.js') }}"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/" class="navbar-logo">📋 Itemizer</a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/projects" class="navbar-link">Projects</a></li>
+                <li><a href="/contacts" class="navbar-link active">Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="controls-area">
+            <div class="left-controls">
+                <div class="search-controls">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search contacts...">
+                </div>
+
+                <div class="sort-controls">
+                    <label for="sort-dropdown">Sort by:</label>
+                    <select id="sort-dropdown" class="sort-dropdown" onchange="location.href='/contacts?sort=' + this.value">
+                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="name_reverse" {% if current_sort == 'name_reverse' %}selected{% endif %}>Name (Z-A)</option>
+                        <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Created (Newest)</option>
+                        <option value="updated_at" {% if current_sort == 'updated_at' %}selected{% endif %}>Updated (Newest)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-controls">
+                    <label for="filter-toggle" class="toggle-label">
+                        <input type="checkbox" id="filter-toggle" class="toggle-checkbox">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Stores Only</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button id="create-contact" class="create-btn" onclick="openContactModal()">Add Contact</button>
+        </div>
+
+        <div class="contacts-section">
+            <div class="contacts-header">
+                <div class="contacts-title">All Contacts ({{ contacts|length }})</div>
+            </div>
+
+            <div class="contacts-list">
+                {% if contacts %}
+                    <table class="contacts-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Type</th>
+                                <th>Materials</th>
+                                <th>Tasks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                                <tr class="contact-row">
+                                    <td class="contact-name-cell">{{ contact.name }}</td>
+                                    <td class="contact-email-cell">
+                                        {% if contact.email %}
+                                            <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                        {% else %}
+                                            <span class="empty">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="contact-phone-cell">
+                                        {% if contact.phone %}
+                                            <a href="tel:{{ contact.phone }}">{{ contact.phone }}</a>
+                                        {% else %}
+                                            <span class="empty">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="contact-type-cell">
+                                        {% if contact.is_store %}
+                                            <span class="contact-badge store-badge">Store</span>
+                                        {% else %}
+                                            <span class="empty">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="contact-materials-cell">{{ contact.materials|length }}</td>
+                                    <td class="contact-tasks-cell">{{ contact.tasks|length }}</td>
+                                    <td class="contact-actions-cell">
+                                        <button type="button" onclick="openEditContactModal({{ contact.id }}, '{{ contact.name }}', '{{ contact.email or '' }}', '{{ contact.phone or '' }}', '{{ contact.website or '' }}', '{{ contact.notes or '' }}', {{ contact.is_store|lower }})" class="edit-btn">Edit</button>
+                                        <form action="/contact/{{ contact.id }}/delete" method="POST" style="display: inline;">
+                                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this contact? This action cannot be undone.')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="no-contacts">
+                        <p>No contacts yet. Click "Add Contact" to create your first contact.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);">
+        <div onclick="event.stopPropagation()" style="background: rgba(15, 15, 35, 0.95); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);">
+            <span style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;" onclick="closeContactModal()">&times;</span>
+            <h2 id="contactModalTitle" style="margin-bottom: 20px; color: #ffffff;">Add Contact</h2>
+            
+            <!-- Create Contact Form -->
+            <form id="createContactForm" action="/contacts" method="POST">
+                <div style="margin-bottom: 20px;">
+                    <label for="contact_name" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Name</label>
+                    <input type="text" id="contact_name" name="name" required style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="contact_email" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Email</label>
+                    <input type="email" id="contact_email" name="email" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="contact_phone" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Phone</label>
+                    <input type="tel" id="contact_phone" name="phone" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="contact_website" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Website</label>
+                    <input type="url" id="contact_website" name="website" placeholder="https://example.com" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="contact_notes" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Notes</label>
+                    <textarea id="contact_notes" name="notes" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; resize: vertical; min-height: 80px; background: rgba(0, 0, 0, 0.3); color: #ffffff;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; font-weight: bold; color: #ffffff;">
+                        <input type="checkbox" id="contact_is_store" name="is_store" style="margin-right: 10px; cursor: pointer;">
+                        This is a store/supplier
+                    </label>
+                </div>
+                <button type="submit" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%;">Create Contact</button>
+            </form>
+
+            <!-- Edit Contact Form -->
+            <form id="editContactForm" style="display: none;">
+                <input type="hidden" id="edit_contact_id">
+                <div style="margin-bottom: 20px;">
+                    <label for="edit_contact_name" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Name</label>
+                    <input type="text" id="edit_contact_name" required style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="edit_contact_email" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Email</label>
+                    <input type="email" id="edit_contact_email" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="edit_contact_phone" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Phone</label>
+                    <input type="tel" id="edit_contact_phone" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="edit_contact_website" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Website</label>
+                    <input type="url" id="edit_contact_website" placeholder="https://example.com" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; background: rgba(0, 0, 0, 0.3); color: #ffffff;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="edit_contact_notes" style="display: block; margin-bottom: 5px; font-weight: bold; color: #ffffff;">Notes</label>
+                    <textarea id="edit_contact_notes" style="width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 5px; font-size: 16px; resize: vertical; min-height: 80px; background: rgba(0, 0, 0, 0.3); color: #ffffff;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; font-weight: bold; color: #ffffff;">
+                        <input type="checkbox" id="edit_contact_is_store" style="margin-right: 10px; cursor: pointer;">
+                        This is a store/supplier
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Save Changes</button>
+                    <button type="button" onclick="closeContactModal(); document.getElementById('createContactForm').style.display = 'block'; document.getElementById('editContactForm').style.display = 'none'; document.getElementById('contactModalTitle').textContent = 'Add Contact';" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
