@@ -121,9 +121,12 @@
                                         </td>
                                         <td class="material-action-cell">
                                             <button type="button" onclick="openEditMaterialModal({{ material.id }}, '{{ material.name }}', '{{ material.description or '' }}', {{ material.price or 'null' }}, '{{ material.link or '' }}', '{{ material.specification_notes or '' }}', {{ material.tags|map(attribute='id')|list|tojson }})" class="edit-material-btn">Edit</button>
-                                            <form action="/project/{{ project.id }}/remove_material/{{ material.id }}" method="POST" class="remove-material-form">
-                                                <button type="submit" class="remove-material-btn" onclick="return confirm('Remove this material from the project?')">Remove</button>
-                                            </form>
+                                            <button type="button" onclick="showMaterialDeleteConfirmation({{ material.id }})" class="remove-material-btn">Remove</button>
+                                            <div id="materialDeleteConfirmation-{{ material.id }}" class="material-delete-confirmation hidden">
+                                                <span class="confirmation-text">Remove this material?</span>
+                                                <button onclick="performMaterialDelete({{ project.id }}, {{ material.id }})" class="action-btn delete-confirm-btn">Yes</button>
+                                                <button onclick="hideMaterialDeleteConfirmation({{ material.id }})" class="action-btn cancel-btn">Cancel</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}

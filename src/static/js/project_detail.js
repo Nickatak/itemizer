@@ -53,6 +53,22 @@ function performDelete(projectId) {
     form.submit();
 }
 
+function showMaterialDeleteConfirmation(materialId) {
+    document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.remove('hidden');
+}
+
+function hideMaterialDeleteConfirmation(materialId) {
+    document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.add('hidden');
+}
+
+function performMaterialDelete(projectId, materialId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/project/${projectId}/remove_material/${materialId}`;
+    document.body.appendChild(form);
+    form.submit();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Bind add task modal listeners
     bindAddTaskModalListeners();
