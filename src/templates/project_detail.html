@@ -85,7 +85,7 @@
             <div class="detail-section materials-section">
                 <div class="materials-header">
                     <div class="materials-title">Materials ({{ project.materials|length }})</div>
-                    <button class="add-material-btn" onclick="openMaterialModal()">Add Material</button>
+                    <button class="add-material-btn">Add Material</button>
                 </div>
 
                 <div class="materials-list">
@@ -120,12 +120,12 @@
                                             {% endif %}
                                         </td>
                                         <td class="material-action-cell">
-                                            <button type="button" onclick="openEditMaterialModal({{ material.id }}, '{{ material.name }}', '{{ material.description or '' }}', {{ material.price or 'null' }}, '{{ material.link or '' }}', '{{ material.specification_notes or '' }}', {{ material.tags|map(attribute='id')|list|tojson }})" class="edit-material-btn">Edit</button>
-                                            <button type="button" onclick="showMaterialDeleteConfirmation({{ material.id }})" class="remove-material-btn">Remove</button>
+                                            <button type="button" class="edit-material-btn" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or 'null' }}" data-material-link="{{ material.link or '' }}" data-material-specification-notes="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
+                                            <button type="button" class="remove-material-btn" data-material-id="{{ material.id }}">Remove</button>
                                             <div id="materialDeleteConfirmation-{{ material.id }}" class="material-delete-confirmation hidden">
                                                 <span class="confirmation-text">Remove this material?</span>
-                                                <button onclick="performMaterialDelete({{ project.id }}, {{ material.id }})" class="action-btn delete-confirm-btn">Yes</button>
-                                                <button onclick="hideMaterialDeleteConfirmation({{ material.id }})" class="action-btn cancel-btn">Cancel</button>
+                                                <button class="action-btn delete-confirm-btn" data-project-id="{{ project.id }}" data-material-id="{{ material.id }}">Yes</button>
+                                                <button class="action-btn cancel-btn" data-material-id="{{ material.id }}">Cancel</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -161,10 +161,10 @@
                     <div class="tasks-title">Tasks ({{ project.tasks|length }})</div>
                     <div class="tasks-header-flex">
                         <label class="toggle-completed-label">
-                            <input type="checkbox" id="toggleCompletedTasks" class="toggle-completed-checkbox" onchange="toggleCompletedTasks()">
+                            <input type="checkbox" id="toggleCompletedTasks" class="toggle-completed-checkbox">
                             Show completed tasks
                         </label>
-                        <button class="add-task-btn" onclick="openTaskModal()">Add Task</button>
+                        <button class="add-task-btn">Add Task</button>
                     </div>
                 </div>
 
@@ -203,7 +203,7 @@
                                 </div>
                                 <div class="task-meta">Created: {{ task.created_at.strftime('%b %d %Y at %-I:%M %p') }}</div>
                                 <div class="task-actions-inline">
-                                    <button type="button" onclick="openEditTaskModal({{ task.id }}, '{{ task.name }}', '{{ task.description or '' }}', {{ task.is_completed|lower }}, '{{ task.start_date.strftime('%Y-%m-%d') if task.start_date else '' }}', '{{ task.end_date.strftime('%Y-%m-%d') if task.end_date else '' }}', '{{ task.difficulty or '' }}', {{ task.completion_percentage or 0 }})" class="edit-task-btn edit-task-btn-inline">Edit</button>
+                                    <button type="button" class="edit-task-btn edit-task-btn-inline" data-task-id="{{ task.id }}" data-task-name="{{ task.name }}" data-task-description="{{ task.description or '' }}" data-task-completed="{{ task.is_completed|lower }}" data-task-start-date="{{ task.start_date.strftime('%Y-%m-%d') if task.start_date else '' }}" data-task-end-date="{{ task.end_date.strftime('%Y-%m-%d') if task.end_date else '' }}" data-task-difficulty="{{ task.difficulty or '' }}" data-task-completion-percentage="{{ task.completion_percentage or 0 }}">Edit</button>
                                 </div>
                             </div>
                         {% endfor %}
@@ -218,19 +218,19 @@
 
         <div class="actions">
             <a href="/edit-project/{{ project.id }}" class="action-btn edit-btn">Edit Project</a>
-            <button onclick="showDeleteConfirmation()" class="action-btn delete-btn">Delete Project</button>
+            <button class="action-btn delete-btn">Delete Project</button>
             <div id="deleteConfirmation" class="delete-confirmation hidden">
                 <span class="confirmation-text">Are you sure? This will also delete all associated tasks.</span>
-                <button onclick="performDelete({{ project.id }})" class="action-btn delete-confirm-btn">Yes, Delete</button>
-                <button onclick="hideDeleteConfirmation()" class="action-btn cancel-btn">Cancel</button>
+                <button class="action-btn delete-confirm-btn" data-project-id="{{ project.id }}">Yes, Delete</button>
+                <button class="action-btn cancel-btn">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- Add Task Modal -->
-    <div id="addTaskModal" onmousedown="if(event.target.id === 'addTaskModal') closeAddTaskModal();">
-        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeAddTaskModal()">&times;</span>
+    <div id="addTaskModal">
+        <div>
+            <span class="close">&times;</span>
             <h2>Add New Task</h2>
             
             <!-- Create Task Form -->
@@ -256,10 +256,10 @@
                     <label>Difficulty</label>
                     <input type="hidden" id="task_difficulty" name="difficulty" value="">
                     <div class="difficulty-grid">
-                        <button type="button" class="difficulty-btn" data-difficulty="Easy" onclick="selectDifficulty('Easy')">Easy</button>
-                        <button type="button" class="difficulty-btn" data-difficulty="Medium" onclick="selectDifficulty('Medium')">Medium</button>
-                        <button type="button" class="difficulty-btn" data-difficulty="Hard" onclick="selectDifficulty('Hard')">Hard</button>
-                        <button type="button" class="difficulty-btn" data-difficulty="Very Hard" onclick="selectDifficulty('Very Hard')">Very Hard</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Easy">Easy</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Medium">Medium</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Hard">Hard</button>
+                        <button type="button" class="difficulty-btn" data-difficulty="Very Hard">Very Hard</button>
                     </div>
                 </div>
                 <div>
@@ -286,9 +286,9 @@
     </div>
 
     <!-- Edit Task Modal -->
-    <div id="editTaskModal" onmousedown="if(event.target.id === 'editTaskModal') closeEditTaskModal();">
-        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeEditTaskModal()">&times;</span>
+    <div id="editTaskModal">
+        <div>
+            <span class="close">&times;</span>
             <h2>Edit Task</h2>
             
             <!-- Edit Task Form -->
@@ -314,10 +314,10 @@
                     <label>Difficulty</label>
                     <input type="hidden" id="edit_task_difficulty" value="">
                     <div class="difficulty-grid">
-                        <button type="button" class="edit-difficulty-btn" data-difficulty="Easy" onclick="selectEditDifficulty('Easy')">Easy</button>
-                        <button type="button" class="edit-difficulty-btn" data-difficulty="Medium" onclick="selectEditDifficulty('Medium')">Medium</button>
-                        <button type="button" class="edit-difficulty-btn" data-difficulty="Hard" onclick="selectEditDifficulty('Hard')">Hard</button>
-                        <button type="button" class="edit-difficulty-btn" data-difficulty="Very Hard" onclick="selectEditDifficulty('Very Hard')">Very Hard</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Easy">Easy</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Medium">Medium</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Hard">Hard</button>
+                        <button type="button" class="edit-difficulty-btn" data-difficulty="Very Hard">Very Hard</button>
                     </div>
                 </div>
                 <div>

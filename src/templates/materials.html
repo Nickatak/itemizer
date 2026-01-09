@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materials Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_material_modal.css') }}">
+    <script src="{{ url_for('static', filename='js/modals/edit_material_modal.js') }}"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/" class="navbar-logo">📋 Itemizer</a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/projects" class="navbar-link">Projects</a></li>
+                <li><a href="/materials" class="navbar-link active">Materials</a></li>
+                <li><a href="/contacts" class="navbar-link">Contacts</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="materials-display" class="materials-table-container">
+            {% if materials %}
+                <table class="materials-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Tags</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materials %}
+                            <tr class="material-row" id="material-row-{{ material.id }}">
+                                <td class="material-name-cell">{{ material.name }}</td>
+                                <td class="material-description-cell">
+                                    {% if material.description %}
+                                        {{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}
+                                    {% else %}
+                                        <em>No description</em>
+                                    {% endif %}
+                                </td>
+                                <td class="material-price-cell">
+                                    {% if material.price %}
+                                        ${{ "%.2f"|format(material.price) }}
+                                    {% else %}
+                                        <em>N/A</em>
+                                    {% endif %}
+                                </td>
+                                <td class="material-status-cell">
+                                    <span class="status-badge {% if material.is_purchased %}purchased{% else %}pending{% endif %}">
+                                        {% if material.is_purchased %}✓ Purchased{% else %}⏳ Pending{% endif %}
+                                    </span>
+                                </td>
+                                <td class="material-tags-cell">
+                                    {% if material.tags %}
+                                        <div class="tags-container">
+                                            {% for tag in material.tags %}
+                                                <span class="tag" style="background-color: {{ tag.color }}; color: {% if tag.color|length > 0 and tag.color != '#ffffff' %}white{% else %}black{% endif %};">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <em>No tags</em>
+                                    {% endif %}
+                                </td>
+                                <td class="material-created-cell">
+                                    {{ material.created_at.strftime('%b %d %Y') }}
+                                </td>
+                                <td class="material-actions-cell">
+                                    <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
+                                    <button class="action-btn delete-btn" title="Delete" data-material-id="{{ material.id }}">Delete</button>
+                                    <div id="materialDeleteConfirmation-{{ material.id }}" class="material-delete-confirmation hidden">
+                                        <span class="confirmation-text">Delete this material?</span>
+                                        <button class="confirm-btn" data-material-id="{{ material.id }}">Yes</button>
+                                        <button class="cancel-btn" data-material-id="{{ material.id }}">Cancel</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-materials">
+                    <p>No materials yet. Add materials to your projects to see them here.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Edit Material Modal -->
+    <div id="editMaterialModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Material</h2>
+            
+            <form id="editMaterialForm" action="/api/materials" method="PUT">
+                <input type="hidden" id="editMaterialId">
+                <div>
+                    <label for="edit_material_name">Material Name</label>
+                    <input type="text" id="edit_material_name" name="name" required>
+                </div>
+                <div>
+                    <label for="edit_material_description">Description</label>
+                    <textarea id="edit_material_description" name="description"></textarea>
+                </div>
+                <div>
+                    <label for="edit_material_price">Price</label>
+                    <input type="number" id="edit_material_price" name="price" step="0.01" min="0">
+                </div>
+                <div>
+                    <label for="edit_material_link">Link</label>
+                    <input type="url" id="edit_material_link" name="link">
+                </div>
+                <div>
+                    <label for="edit_material_specification_notes">Specifications</label>
+                    <textarea id="edit_material_specification_notes" name="specification_notes"></textarea>
+                </div>
+                
+                <div>
+                    <label>Tags</label>
+                    
+                    <div class="tag-creation-container">
+                        <div>
+                            <label class="tag-creation-label">Create New Tag</label>
+                            <input type="text" id="edit_new_tag_name" class="tag-creation-input" placeholder="Tag name (e.g., 'Urgent', 'Electronics')">
+                            <div class="tag-creation-grid">
+                                <div class="tag-creation-color-container">
+                                    <label class="tag-creation-color-label">Color</label>
+                                    <input type="color" id="edit_new_tag_color" class="tag-creation-color" value="#667eea">
+                                </div>
+                                <div class="tag-creation-button-container">
+                                    <button type="button" id="edit_create-tag-btn" class="tag-create-btn">Create Tag</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="edit_tags-list" class="tags-list">
+                    </div>
+                    <div id="edit_new-tags-container"></div>
+                </div>
+                
+                <div class="material-button-group">
+                    <button type="submit">Save Changes</button>
+                    <button type="button" class="cancel-edit-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showMaterialDeleteConfirmation(materialId) {
+            document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.remove('hidden');
+        }
+
+        function hideMaterialDeleteConfirmation(materialId) {
+            document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.add('hidden');
+        }
+
+        function performMaterialDelete(materialId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/material/${materialId}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Edit material buttons
+            const editBtns = document.querySelectorAll('.material-actions-cell .edit-btn');
+            editBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const materialId = this.dataset.materialId;
+                    const name = this.dataset.materialName;
+                    const description = this.dataset.materialDescription;
+                    const price = this.dataset.materialPrice;
+                    const link = this.dataset.materialLink;
+                    const specs = this.dataset.materialSpecs;
+                    const tagIds = JSON.parse(this.dataset.materialTags || '[]');
+                    
+                    // Fetch all available tags and populate the modal
+                    fetch('/api/tags')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.tags) {
+                                const tagsList = document.getElementById('edit_tags-list');
+                                tagsList.innerHTML = '';
+                                
+                                if (data.tags.length === 0) {
+                                    const p = document.createElement('p');
+                                    p.className = 'no-tags';
+                                    p.textContent = 'No tags available. Create one below!';
+                                    tagsList.appendChild(p);
+                                } else {
+                                    data.tags.forEach(tag => {
+                                        const label = document.createElement('label');
+                                        label.innerHTML = `
+                                            <input type="checkbox" name="edit_tags" value="${tag.id}" ${tagIds.includes(tag.id) ? 'checked' : ''}>
+                                            <span class="tag-badge" style="background-color: ${tag.color};">${tag.name}</span>
+                                        `;
+                                        tagsList.appendChild(label);
+                                    });
+                                }
+                            }
+                            openEditMaterialModal(materialId, name, description, price, link, specs, tagIds);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching tags:', error);
+                            openEditMaterialModal(materialId, name, description, price, link, specs, tagIds);
+                        });
+                });
+            });
+
+            // Delete buttons
+            const deleteBtns = document.querySelectorAll('.material-actions-cell .delete-btn');
+            deleteBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showMaterialDeleteConfirmation(this.dataset.materialId);
+                });
+            });
+
+            // Delete confirm buttons
+            const confirmBtns = document.querySelectorAll('.material-delete-confirmation .confirm-btn');
+            confirmBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    performMaterialDelete(this.dataset.materialId);
+                });
+            });
+
+            // Delete cancel buttons
+            const cancelBtns = document.querySelectorAll('.material-delete-confirmation .cancel-btn');
+            cancelBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    hideMaterialDeleteConfirmation(this.dataset.materialId);
+                });
+            });
+
+            // Edit modal close button
+            const closeBtn = document.querySelector('#editMaterialModal .close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeEditMaterialModal);
+            }
+
+            // Edit modal cancel button
+            const cancelEditBtn = document.querySelector('.cancel-edit-btn');
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', closeEditMaterialModal);
+            }
+
+            // Edit modal backdrop
+            const editModal = document.getElementById('editMaterialModal');
+            if (editModal) {
+                editModal.addEventListener('mousedown', function(e) {
+                    if (e.target === this) {
+                        closeEditMaterialModal();
+                    }
+                });
+                
+                const modalContent = editModal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
+                    modalContent.addEventListener('click', (e) => e.stopPropagation());
+                }
+            }
+
+            // Create tag button
+            const createTagBtn = document.querySelector('#edit_create-tag-btn');
+            if (createTagBtn) {
+                createTagBtn.addEventListener('click', createEditTag);
+            }
+
+            // Edit form submission
+            const editForm = document.getElementById('editMaterialForm');
+            if (editForm) {
+                editForm.addEventListener('submit', submitEditMaterialForm);
+            }
+        });
+
+        function submitEditMaterialForm(e) {
+            e.preventDefault();
+            const materialId = document.getElementById('editMaterialId').value;
+            const name = document.getElementById('edit_material_name').value;
+            const description = document.getElementById('edit_material_description').value;
+            const price = document.getElementById('edit_material_price').value;
+            const link = document.getElementById('edit_material_link').value;
+            const specificationNotes = document.getElementById('edit_material_specification_notes').value;
+            
+            // Get selected tags
+            const tagCheckboxes = document.querySelectorAll('#edit_tags-list input[type="checkbox"]:checked');
+            const tags = Array.from(tagCheckboxes).map(cb => parseInt(cb.value));
+            
+            // Get new tags
+            const newTags = Object.values(editNewTags);
+
+            fetch(`/api/materials/${materialId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: description,
+                    price: price ? parseFloat(price) : null,
+                    link: link,
+                    specification_notes: specificationNotes,
+                    tags: tags,
+                    new_tags: newTags
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Material updated successfully!');
+                    closeEditMaterialModal();
+                    location.reload();
+                } else {
+                    alert('Error updating material: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating material');
+            });
+        }
+    </script>
+</body>
+</html>
