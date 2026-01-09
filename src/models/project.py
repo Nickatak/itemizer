@@ -14,6 +14,9 @@ class Project(db.Model):
     # Many-to-many relationship with materials
     materials = db.relationship('Material', secondary=project_materials, backref=db.backref('projects', lazy=True))
 
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.relationship('User', backref=db.backref('projects', lazy=True))
+
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
@@ -22,8 +25,12 @@ class Project(db.Model):
 
 
 # Project CRUD functions
-def get_all_projects(sort_by=None, filter_completed=None):
+def get_all_projects(sort_by=None, filter_completed=None, created_by_id=None):
     query = Project.query
+    
+    # Filter by creator if provided
+    if created_by_id is not None:
+        query = query.filter(Project.created_by_id == created_by_id)
     
     if filter_completed == 'completed':
         query = query.filter(Project.end_date.isnot(None))
@@ -48,8 +55,8 @@ def get_all_projects(sort_by=None, filter_completed=None):
 def get_project_by_id(project_id):
     return Project.query.get(project_id)
 
-def create_project(name, description, start_date=None, end_date=None):
-    project = Project(name=name, description=description)
+def create_project(name, description, start_date=None, end_date=None, created_by_id=None):
+    project = Project(name=name, description=description, created_by_id=created_by_id)
     if start_date:
         project.start_date = datetime.strptime(start_date, '%Y-%m-%d')
     if end_date:

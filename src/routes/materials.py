@@ -1,5 +1,6 @@
-from flask import Blueprint, request, redirect, url_for, jsonify
+from flask import Blueprint, request, redirect, url_for, jsonify, session
 import json
+from .auth import login_required
 from ..models.material import (
     get_all_materials, get_material_by_id, create_material, 
     update_material, add_tag_to_material, remove_tag_from_material, add_contact_to_material
@@ -11,16 +12,19 @@ from ..models.contact import create_contact
 materials_bp = Blueprint('materials', __name__)
 
 @materials_bp.route('/project/<int:project_id>/add_material/<int:material_id>', methods=['POST'])
+@login_required
 def add_material_to_project_route(project_id, material_id):
     add_material_to_project(project_id, material_id)
     return redirect(url_for('projects.project_detail', project_id=project_id))
 
 @materials_bp.route('/project/<int:project_id>/remove_material/<int:material_id>', methods=['POST'])
+@login_required
 def remove_material_from_project_route(project_id, material_id):
     remove_material_from_project(project_id, material_id)
     return redirect(url_for('projects.project_detail', project_id=project_id))
 
 @materials_bp.route('/materials', methods=['POST'])
+@login_required
 def create_material_route():
     name = request.form.get('name')
     description = request.form.get('description')
@@ -43,7 +47,8 @@ def create_material_route():
                 price_float = float(price)
             except ValueError:
                 price_float = None
-        material = create_material(name, description, price_float, link, specification_notes)
+        user_id = session.get('user_id')
+        material = create_material(name, description, price_float, link, specification_notes, created_by_id=user_id)
         
         # Handle contact creation or selection
         if contact_option == 'select':
@@ -60,7 +65,7 @@ def create_material_route():
                 new_contact_phone = request.form.get('new_contact_phone')
                 is_store = request.form.get('new_contact_is_store') == 'on'
                 
-                new_contact = create_contact(new_contact_name, email=new_contact_email, phone=new_contact_phone, is_store=is_store)
+                new_contact = create_contact(new_contact_name, email=new_contact_email, phone=new_contact_phone, is_store=is_store, created_by_id=user_id)
                 add_contact_to_material(material.id, new_contact.id)
         
         # Create and add new tags
@@ -68,7 +73,7 @@ def create_material_route():
         for new_tag_json in new_tags:
             try:
                 new_tag_data = json.loads(new_tag_json)
-                tag = create_tag(new_tag_data['name'], new_tag_data['color'])
+                tag = create_tag(new_tag_data['name'], new_tag_data['color'], created_by_id=user_id)
                 new_tag_mapping[new_tag_data['id']] = tag.id
             except (json.JSONDecodeError, KeyError, ValueError):
                 pass
@@ -91,6 +96,7 @@ def create_material_route():
     return redirect(url_for('projects.project_detail', project_id=project_id))
 
 @materials_bp.route('/api/materials/<int:material_id>', methods=['PUT'])
+@login_required
 def api_update_material(material_id):
     data = request.get_json()
     
@@ -123,9 +129,10 @@ def api_update_material(material_id):
             
             # Create and add new tags
             new_tag_mapping = {}
+            user_id = session.get('user_id')
             for new_tag_data in new_tags:
                 try:
-                    tag = create_tag(new_tag_data['name'], new_tag_data['color'])
+                    tag = create_tag(new_tag_data['name'], new_tag_data['color'], created_by_id=user_id)
                     new_tag_mapping[new_tag_data['id']] = tag.id
                 except (KeyError, ValueError):
                     pass

@@ -20,6 +20,9 @@ class Task(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     project = db.relationship('Project', backref=db.backref('tasks', lazy=True))
     
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.relationship('User', backref=db.backref('tasks', lazy=True))
+    
     # Many-to-many relationship with contacts
     contacts = db.relationship('Contact', secondary=task_contacts, backref=db.backref('tasks', lazy=True))
 
@@ -34,8 +37,8 @@ def get_all_tasks():
 def get_task_by_id(task_id):
     return Task.query.get(task_id)
 
-def create_task(name, description, project_id, is_completed=False, start_date=None, end_date=None, difficulty=None, completion_percentage=0):
-    task = Task(name=name, description=description, project_id=project_id, is_completed=is_completed, start_date=start_date, end_date=end_date, difficulty=difficulty, completion_percentage=completion_percentage)
+def create_task(name, description, project_id, is_completed=False, start_date=None, end_date=None, difficulty=None, completion_percentage=0, created_by_id=None):
+    task = Task(name=name, description=description, project_id=project_id, is_completed=is_completed, start_date=start_date, end_date=end_date, difficulty=difficulty, completion_percentage=completion_percentage, created_by_id=created_by_id)
     db.session.add(task)
     db.session.commit()
     return task

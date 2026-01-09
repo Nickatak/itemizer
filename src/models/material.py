@@ -10,27 +10,34 @@ class Material(db.Model):
     link = db.Column(db.String(500))
     specification_notes = db.Column(db.Text)
     is_purchased = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=db.func.now())
-
+    
     # Many-to-many relationship with tags
     tags = db.relationship('Tag', secondary=material_tags, backref=db.backref('materials', lazy=True))
     
     # Many-to-many relationship with contacts
     contacts = db.relationship('Contact', secondary=material_contacts, backref=db.backref('materials', lazy=True))
 
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.relationship('User', backref=db.backref('materials', lazy=True))
+
+    created_at = db.Column(db.DateTime, default=db.func.now())
+
     def __repr__(self):
         return f'<Material {self.name}>'
 
 
 # Material CRUD functions
-def get_all_materials():
-    return Material.query.all()
+def get_all_materials(created_by_id=None):
+    query = Material.query
+    if created_by_id is not None:
+        query = query.filter(Material.created_by_id == created_by_id)
+    return query.all()
 
 def get_material_by_id(material_id):
     return Material.query.get(material_id)
 
-def create_material(name, description, price=None, link=None, specification_notes=None):
-    material = Material(name=name, description=description, price=price, link=link, specification_notes=specification_notes)
+def create_material(name, description, price=None, link=None, specification_notes=None, created_by_id=None):
+    material = Material(name=name, description=description, price=price, link=link, specification_notes=specification_notes, created_by_id=created_by_id)
     db.session.add(material)
     db.session.commit()
     return material

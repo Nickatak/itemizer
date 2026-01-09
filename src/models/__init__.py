@@ -9,6 +9,7 @@ from .project import Project
 from .task import Task
 from .tag import Tag
 from .contact import Contact
+from .user import User
 
-__all__ = ['db', 'Material', 'Project', 'Task', 'Tag', 'Contact', 
+__all__ = ['db', 'Material', 'Project', 'Task', 'Tag', 'Contact', 'User',
            'project_materials', 'material_tags', 'task_contacts', 'material_contacts']

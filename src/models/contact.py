@@ -9,6 +9,9 @@ class Contact(db.Model):
     notes = db.Column(db.Text, nullable=True)
     is_store = db.Column(db.Boolean, default=False)
     
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.relationship('User', backref=db.backref('contacts', lazy=True))
+    
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
@@ -17,8 +20,10 @@ class Contact(db.Model):
 
 
 # Contact CRUD functions
-def get_all_contacts(sort_by=None):
+def get_all_contacts(sort_by=None, created_by_id=None):
     query = Contact.query
+    if created_by_id is not None:
+        query = query.filter(Contact.created_by_id == created_by_id)
     if sort_by == 'name':
         query = query.order_by(Contact.name)
     elif sort_by == 'created_at':
@@ -28,8 +33,8 @@ def get_all_contacts(sort_by=None):
 def get_contact_by_id(contact_id):
     return Contact.query.get(contact_id)
 
-def create_contact(name, email=None, phone=None, notes=None, is_store=False):
-    contact = Contact(name=name, email=email, phone=phone, notes=notes, is_store=is_store)
+def create_contact(name, email=None, phone=None, notes=None, is_store=False, created_by_id=None):
+    contact = Contact(name=name, email=email, phone=phone, notes=notes, is_store=is_store, created_by_id=created_by_id)
     db.session.add(contact)
     db.session.commit()
     return contact

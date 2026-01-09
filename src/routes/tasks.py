@@ -1,10 +1,12 @@
-from flask import Blueprint, request, redirect, url_for, jsonify
+from flask import Blueprint, request, redirect, url_for, jsonify, session
 from datetime import datetime
+from .auth import login_required
 from ..models.task import create_task, get_task_by_id, update_task
 
 tasks_bp = Blueprint('tasks', __name__)
 
 @tasks_bp.route('/tasks', methods=['POST'])
+@login_required
 def create_task_route():
     name = request.form.get('name')
     description = request.form.get('description')
@@ -32,10 +34,12 @@ def create_task_route():
             except ValueError:
                 completion_pct = 0
 
-        create_task(name, description, int(project_id), is_completed, start_date_obj, end_date_obj, difficulty, completion_pct)
+        user_id = session.get('user_id')
+        create_task(name, description, int(project_id), is_completed, start_date_obj, end_date_obj, difficulty, completion_pct, created_by_id=user_id)
     return redirect(url_for('projects.project_detail', project_id=project_id))
 
 @tasks_bp.route('/api/tasks/<int:task_id>', methods=['PUT'])
+@login_required
 def api_update_task(task_id):
     data = request.get_json()
     
