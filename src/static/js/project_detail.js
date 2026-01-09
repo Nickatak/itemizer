@@ -37,10 +37,20 @@ function toggleCompletedTasks() {
     });
 }
 
-function confirmDelete() {
-    if (confirm('Are you sure you want to delete this project? This will also delete all associated tasks. This action cannot be undone.')) {
-        window.location.href = '/projects';
-    }
+function showDeleteConfirmation() {
+    document.getElementById('deleteConfirmation').classList.remove('hidden');
+}
+
+function hideDeleteConfirmation() {
+    document.getElementById('deleteConfirmation').classList.add('hidden');
+}
+
+function performDelete(projectId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/project/${projectId}/delete`;
+    document.body.appendChild(form);
+    form.submit();
 }
 
 document.addEventListener('DOMContentLoaded', function() {

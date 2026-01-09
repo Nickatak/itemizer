@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from .auth import login_required
-from ..models.project import get_all_projects, create_project, get_project_by_id, update_project
+from ..models.project import get_all_projects, create_project, get_project_by_id, update_project, delete_project
 from ..models.material import get_all_materials
 from ..models.tag import get_all_tags
 from ..models.contact import get_all_contacts
@@ -60,3 +60,9 @@ def update_project_route(project_id):
     if name:
         update_project(project_id, name, description, start_date, end_date, is_complete)
     return redirect(url_for('projects.project_detail', project_id=project_id))
+
+@projects_bp.route('/project/<int:project_id>/delete', methods=['POST'])
+@login_required
+def delete_project_route(project_id):
+    delete_project(project_id)
+    return redirect(url_for('projects.projects'))

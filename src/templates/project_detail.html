@@ -215,7 +215,12 @@
 
         <div class="actions">
             <a href="/edit-project/{{ project.id }}" class="action-btn edit-btn">Edit Project</a>
-            <button onclick="confirmDelete()" class="action-btn delete-btn">Delete Project</button>
+            <button onclick="showDeleteConfirmation()" class="action-btn delete-btn">Delete Project</button>
+            <div id="deleteConfirmation" class="delete-confirmation hidden">
+                <span class="confirmation-text">Are you sure? This will also delete all associated tasks.</span>
+                <button onclick="performDelete({{ project.id }})" class="action-btn delete-confirm-btn">Yes, Delete</button>
+                <button onclick="hideDeleteConfirmation()" class="action-btn cancel-btn">Cancel</button>
+            </div>
         </div>
     </div>
 
