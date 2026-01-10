@@ -24,6 +24,12 @@
     </nav>
 
     <div class="container">
+        <!-- Search Bar -->
+        <div class="search-bar-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search materials by name or description...">
+            <span class="search-icon">🔍</span>
+        </div>
+
         <div id="materials-display" class="materials-table-container">
             {% if materials %}
                 <table class="materials-table">
@@ -331,6 +337,62 @@
                 alert('Error updating material');
             });
         }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const materialsTable = document.querySelector('.materials-table tbody');
+            const materialRows = document.querySelectorAll('.material-row');
+            const noMaterials = document.querySelector('.no-materials');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    materialRows.forEach(row => {
+                        const name = row.querySelector('.material-name-cell')?.textContent.toLowerCase() || '';
+                        const description = row.querySelector('.material-description-cell')?.textContent.toLowerCase() || '';
+                        const tagsCell = row.querySelector('.material-tags-cell');
+                        let tagsText = '';
+                        
+                        if (tagsCell) {
+                            const tags = tagsCell.querySelectorAll('.tag');
+                            tagsText = Array.from(tags).map(tag => tag.textContent.toLowerCase()).join(' ');
+                        }
+                        
+                        if (name.includes(searchTerm) || description.includes(searchTerm) || tagsText.includes(searchTerm)) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Show no results message if needed
+                    if (materialsTable && visibleCount === 0 && searchTerm) {
+                        materialsTable.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">No materials match your search.</td></tr>';
+                    } else if (materialsTable && visibleCount > 0 && searchTerm) {
+                        // Restore the rows if they were hidden
+                        materialRows.forEach(row => {
+                            const name = row.querySelector('.material-name-cell')?.textContent.toLowerCase() || '';
+                            const description = row.querySelector('.material-description-cell')?.textContent.toLowerCase() || '';
+                            const tagsCell = row.querySelector('.material-tags-cell');
+                            let tagsText = '';
+                            
+                            if (tagsCell) {
+                                const tags = tagsCell.querySelectorAll('.tag');
+                                tagsText = Array.from(tags).map(tag => tag.textContent.toLowerCase()).join(' ');
+                            }
+                            
+                            if (name.includes(searchTerm) || description.includes(searchTerm) || tagsText.includes(searchTerm)) {
+                                materialsTable.appendChild(row);
+                            }
+                        });
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
