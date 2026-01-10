@@ -1,10 +1,22 @@
 from . import db
 
-# Association table for many-to-many relationship between Project and Material
-project_materials = db.Table('project_materials',
-    db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key=True),
-    db.Column('material_id', db.Integer, db.ForeignKey('material.id'), primary_key=True)
-)
+
+class ProjectMaterial(db.Model):
+    """Association object for many-to-many relationship between Project and Material."""
+    __tablename__ = 'project_materials'
+    
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), primary_key=True)
+    material_id = db.Column(db.Integer, db.ForeignKey('material.id'), primary_key=True)
+    order = db.Column(db.Integer, default=0)
+    count = db.Column(db.Integer, default=1)
+    
+    # Relationships
+    project = db.relationship('Project', backref=db.backref('material_associations', cascade='all, delete-orphan'))
+    material = db.relationship('Material', backref=db.backref('project_associations', cascade='all, delete-orphan'))
+    
+    def __repr__(self):
+        return f'<ProjectMaterial project_id={self.project_id} material_id={self.material_id} order={self.order} count={self.count}>'
+
 
 # Association table for many-to-many relationship between Material and Tag
 material_tags = db.Table('material_tags',

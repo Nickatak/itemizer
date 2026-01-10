@@ -1,5 +1,4 @@
 from . import db
-from .associations import project_materials
 from datetime import datetime
 
 class Project(db.Model):
@@ -11,8 +10,8 @@ class Project(db.Model):
     end_date = db.Column(db.DateTime, nullable=True)
     is_complete = db.Column(db.Boolean, default=False)
 
-    # Many-to-many relationship with materials
-    materials = db.relationship('Material', secondary=project_materials, backref=db.backref('projects', lazy=True))
+    # Many-to-many relationship with materials through association object
+    materials = db.relationship('Material', secondary='project_materials', backref=db.backref('projects', lazy=True))
     
     # One-to-many relationship with tasks - cascade delete
     tasks = db.relationship('Task', backref='project', cascade='all, delete-orphan', lazy=True)

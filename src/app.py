@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, session
 from .models import db
+from .models.user import create_user, get_user_by_email
 from .routes.projects import projects_bp
 from .routes.tasks import tasks_bp
 from .routes.materials import materials_bp
@@ -15,6 +16,10 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        
+        # Create default user if it doesn't exist
+        if not get_user_by_email('asdf@asdf.com'):
+            create_user('asdf@asdf.com', 'asdf')
 
     # Register blueprints
     app.register_blueprint(auth_bp)
