@@ -13,6 +13,9 @@ class Project(db.Model):
 
     # Many-to-many relationship with materials
     materials = db.relationship('Material', secondary=project_materials, backref=db.backref('projects', lazy=True))
+    
+    # One-to-many relationship with tasks - cascade delete
+    tasks = db.relationship('Task', backref='project', cascade='all, delete-orphan', lazy=True)
 
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_by = db.relationship('User', backref=db.backref('projects', lazy=True))
