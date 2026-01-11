@@ -6,6 +6,7 @@ from .routes.tasks import tasks_bp
 from .routes.materials import materials_bp
 from .routes.contacts import contacts_bp
 from .routes.auth import auth_bp
+from .routes.api import api_bp
 
 def create_app():
     app = Flask(__name__)
@@ -23,6 +24,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp)
     app.register_blueprint(projects_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(materials_bp)

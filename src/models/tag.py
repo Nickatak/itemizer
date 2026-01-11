@@ -30,3 +30,21 @@ def create_tag(name, color='#00ff88', created_by_id=None):
     db.session.add(tag)
     db.session.commit()
     return tag
+
+def update_tag(tag_id, name=None, color=None):
+    tag = get_tag_by_id(tag_id)
+    if tag:
+        if name is not None:
+            tag.name = name
+        if color is not None:
+            tag.color = color
+        db.session.commit()
+    return tag
+
+def delete_tag(tag_id):
+    tag = get_tag_by_id(tag_id)
+    if tag:
+        db.session.delete(tag)
+        db.session.commit()
+        return True
+    return False
