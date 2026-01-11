@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+    background: linear-gradient(135deg, #0a1f1a 0%, #0d2b1f 50%, #061410 100%);
     min-height: 100vh;
     color: #e0e0e0;
     padding: 90px 20px 20px 20px;
@@ -19,8 +19,8 @@ body {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(15, 15, 35, 0.95);
-    border-bottom: 2px solid #667eea;
+    background: rgba(6, 20, 16, 0.95);
+    border-bottom: 2px solid #00ff88;
     backdrop-filter: blur(20px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
@@ -43,7 +43,7 @@ body {
 .navbar-logo {
     font-size: 1.5em;
     font-weight: 700;
-    color: #667eea;
+    color: #00ff88;
     text-decoration: none;
     transition: all 0.3s;
     display: flex;
@@ -52,7 +52,7 @@ body {
 }
 
 .navbar-logo:hover {
-    color: #764ba2;
+    color: #00cc6a;
     transform: scale(1.05);
 }
 
@@ -74,15 +74,15 @@ body {
 }
 
 .navbar-link:hover {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
-    border-color: rgba(102, 126, 234, 0.3);
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.3);
 }
 
 .navbar-link.active {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.2);
-    border-color: #667eea;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.2);
+    border-color: #00ff88;
 }
 
 /* Controls Area */
@@ -131,8 +131,8 @@ body {
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    border-color: #00ff88;
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
     background: rgba(255, 255, 255, 0.1);
 }
 
@@ -149,9 +149,9 @@ body {
 }
 
 .sort-dropdown {
-    background: rgba(15, 15, 35, 0.8);
+    background: rgba(6, 20, 16, 0.8);
     color: #e0e0e0;
-    border: 1px solid rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(0, 255, 136, 0.3);
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
@@ -169,31 +169,31 @@ body {
 }
 
 .sort-dropdown:hover {
-    border-color: #667eea;
-    background-color: rgba(102, 126, 234, 0.15);
-    box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+    border-color: #00ff88;
+    background-color: rgba(0, 255, 136, 0.15);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
 }
 
 .sort-dropdown:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
-    background-color: rgba(102, 126, 234, 0.1);
+    border-color: #00ff88;
+    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.25);
+    background-color: rgba(0, 255, 136, 0.1);
 }
 
 .sort-dropdown option {
-    background: rgba(15, 15, 35, 0.95);
+    background: rgba(6, 20, 16, 0.95);
     color: #e0e0e0;
     padding: 10px;
 }
 
 .sort-dropdown option:hover {
-    background: rgba(102, 126, 234, 0.3);
+    background: rgba(0, 255, 136, 0.3);
     color: #ffffff;
 }
 
 .sort-dropdown option:checked {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
     color: #ffffff;
 }
 
@@ -239,8 +239,8 @@ body {
 }
 
 .toggle-checkbox:checked + .toggle-slider {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    border-color: rgba(0, 255, 136, 0.3);
 }
 
 .toggle-checkbox:checked + .toggle-slider::before {
@@ -254,7 +254,7 @@ body {
 }
 
 .create-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -268,13 +268,13 @@ body {
 .create-btn:hover {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: rgba(15, 15, 35, 0.95);
+    background: rgba(6, 20, 16, 0.95);
     border-radius: 15px;
     padding: 40px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -285,13 +285,13 @@ body {
 .header {
     text-align: center;
     margin-bottom: 40px;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid #00ff88;
     padding-bottom: 20px;
     position: relative;
 }
 
 .back-link {
-    color: #667eea;
+    color: #00ff88;
     text-decoration: none;
     font-size: 1em;
     padding: 8px 12px;
@@ -301,7 +301,7 @@ body {
 
 .back-link:hover {
     color: #ffffff;
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(0, 255, 136, 0.2);
     transform: translateX(-2px);
 }
 
@@ -332,7 +332,7 @@ body {
 }
 
 .add-contact-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -345,7 +345,7 @@ body {
 
 .add-contact-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
 }
 
 .contacts-list {
@@ -364,15 +364,15 @@ body {
 }
 
 .contacts-table thead {
-    background: rgba(102, 126, 234, 0.15);
-    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    background: rgba(0, 255, 136, 0.15);
+    border-bottom: 2px solid rgba(0, 255, 136, 0.3);
 }
 
 .contacts-table th {
     padding: 16px;
     text-align: left;
     font-weight: 600;
-    color: #667eea;
+    color: #00ff88;
     text-transform: uppercase;
     font-size: 0.9em;
     letter-spacing: 0.5px;
@@ -384,7 +384,7 @@ body {
 }
 
 .contacts-table tbody tr:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(0, 255, 136, 0.1);
 }
 
 .contacts-table tbody tr:last-child {
@@ -402,7 +402,7 @@ body {
 }
 
 .contact-row:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(0, 255, 136, 0.1);
 }
 
 .contact-name-cell {
@@ -412,14 +412,14 @@ body {
 
 .contact-email-cell a,
 .contact-phone-cell a {
-    color: #667eea;
+    color: #00ff88;
     text-decoration: none;
     transition: all 0.3s;
 }
 
 .contact-email-cell a:hover,
 .contact-phone-cell a:hover {
-    color: #764ba2;
+    color: #00cc6a;
     text-decoration: underline;
 }
 
@@ -465,12 +465,12 @@ body {
 }
 
 .meta-badge {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(0, 255, 136, 0.2);
     color: #a0b4ff;
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.85em;
-    border: 1px solid rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .contact-actions {
@@ -493,13 +493,13 @@ body {
 }
 
 .edit-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
     color: white;
 }
 
 .edit-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .delete-btn {

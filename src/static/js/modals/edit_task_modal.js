@@ -35,8 +35,8 @@ function selectEditDifficulty(difficulty) {
     // Add active state to selected button
     const selectedBtn = document.querySelector(`.edit-difficulty-btn[data-difficulty="${difficulty}"]`);
     if (selectedBtn) {
-        selectedBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100)';
-        selectedBtn.style.borderColor = '#667eea';
+        selectedBtn.style.background = 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100)';
+        selectedBtn.style.borderColor = '#00ff88';
         selectedBtn.style.color = '#ffffff';
     }
 }

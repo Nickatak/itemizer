@@ -52,7 +52,7 @@ function createEditTag() {
         if (tagSpan.textContent === tagName) {
             checkbox.checked = true;
             document.getElementById('edit_new_tag_name').value = '';
-            document.getElementById('edit_new_tag_color').value = '#667eea';
+            document.getElementById('edit_new_tag_color').value = '#00ff88';
             return;
         }
     }
@@ -99,7 +99,7 @@ function createEditTag() {
     container.appendChild(label);
     
     document.getElementById('edit_new_tag_name').value = '';
-    document.getElementById('edit_new_tag_color').value = '#667eea';
+    document.getElementById('edit_new_tag_color').value = '#00ff88';
 }
 
 function submitEditMaterialForm() {

@@ -118,7 +118,7 @@
 
     <!-- Contact Modal -->
     <div id="contactModal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);">
-        <div onclick="event.stopPropagation()" style="background: rgba(15, 15, 35, 0.95); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);">
+        <div onclick="event.stopPropagation()" style="background: rgba(6, 20, 16, 0.95); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);">
             <span style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;" onclick="closeContactModal()">&times;</span>
             <h2 id="contactModalTitle" style="margin-bottom: 20px; color: #ffffff;">Add Contact</h2>
             
@@ -150,7 +150,7 @@
                         This is a store/supplier
                     </label>
                 </div>
-                <button type="submit" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%;">Create Contact</button>
+                <button type="submit" style="background: #00ff88; color: #000; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%;">Create Contact</button>
             </form>
 
             <!-- Edit Contact Form -->
@@ -183,7 +183,7 @@
                     </label>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Save Changes</button>
+                    <button type="submit" style="background: #00ff88; color: #000; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Save Changes</button>
                     <button type="button" onclick="closeContactModal(); document.getElementById('createContactForm').style.display = 'block'; document.getElementById('editContactForm').style.display = 'none'; document.getElementById('contactModalTitle').textContent = 'Add Contact';" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Cancel</button>
                 </div>
             </form>

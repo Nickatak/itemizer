@@ -12,7 +12,7 @@
 }
 
 #materialModal > div {
-    background: rgba(15, 15, 35, 0.95);
+    background: rgba(6, 20, 16, 0.95);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -69,8 +69,8 @@
 }
 
 .tab-button.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
+    color: #00ff88;
+    border-bottom-color: #00ff88;
 }
 
 /* Tab Content */
@@ -454,7 +454,7 @@
 }
 
 #editMaterialModal > div {
-    background: rgba(15, 15, 35, 0.95);
+    background: rgba(6, 20, 16, 0.95);
     position: fixed;
     top: 50%;
     left: 50%;

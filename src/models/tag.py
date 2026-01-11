@@ -3,7 +3,7 @@ from . import db
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
-    color = db.Column(db.String(7), default='#667eea')  # hex color code
+    color = db.Column(db.String(7), default='#00ff88')  # hex color code
     
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_by = db.relationship('User', backref=db.backref('tags', lazy=True))
@@ -25,7 +25,7 @@ def get_tag_by_id(tag_id):
 def get_tag_by_name(name):
     return Tag.query.filter_by(name=name).first()
 
-def create_tag(name, color='#667eea', created_by_id=None):
+def create_tag(name, color='#00ff88', created_by_id=None):
     tag = Tag(name=name, color=color, created_by_id=created_by_id)
     db.session.add(tag)
     db.session.commit()
