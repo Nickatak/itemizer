@@ -82,11 +82,6 @@
                                 <td class="material-actions-cell">
                                     <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
                                     <button class="action-btn delete-btn" title="Delete" data-material-id="{{ material.id }}">Delete</button>
-                                    <div id="materialDeleteConfirmation-{{ material.id }}" class="material-delete-confirmation hidden">
-                                        <span class="confirmation-text">Delete this material?</span>
-                                        <button class="confirm-btn" data-material-id="{{ material.id }}">Yes</button>
-                                        <button class="cancel-btn" data-material-id="{{ material.id }}">Cancel</button>
-                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -162,14 +157,6 @@
     </div>
 
     <script>
-        function showMaterialDeleteConfirmation(materialId) {
-            document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.remove('hidden');
-        }
-
-        function hideMaterialDeleteConfirmation(materialId) {
-            document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.add('hidden');
-        }
-
         function performMaterialDelete(materialId) {
             const form = document.createElement('form');
             form.method = 'POST';
@@ -224,29 +211,53 @@
                 });
             });
 
-            // Delete buttons
-            const deleteBtns = document.querySelectorAll('.material-actions-cell .delete-btn');
-            deleteBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    showMaterialDeleteConfirmation(this.dataset.materialId);
+            // Delete buttons - show confirmation
+            function attachDeleteListener() {
+                const deleteBtns = document.querySelectorAll('.material-actions-cell .delete-btn');
+                deleteBtns.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const materialId = this.dataset.materialId;
+                        const actionsCell = this.closest('.material-actions-cell');
+                        
+                        // Replace with confirmation buttons
+                        this.style.display = 'none';
+                        const editBtn = actionsCell.querySelector('.edit-btn');
+                        if (editBtn) editBtn.style.display = 'none';
+                        
+                        // Create confirmation button
+                        const confirmBtn = document.createElement('button');
+                        confirmBtn.className = 'action-btn confirm-delete-btn';
+                        confirmBtn.textContent = 'Confirm Delete';
+                        confirmBtn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+                        confirmBtn.dataset.materialId = materialId;
+                        
+                        // Create cancel button
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.className = 'action-btn cancel-delete-btn';
+                        cancelBtn.textContent = 'Cancel';
+                        cancelBtn.style.background = 'linear-gradient(135deg, #00cc6a 0%, #009d52 100%)';
+                        
+                        actionsCell.appendChild(confirmBtn);
+                        actionsCell.appendChild(cancelBtn);
+                        
+                        // Confirm delete
+                        confirmBtn.addEventListener('click', function() {
+                            performMaterialDelete(materialId);
+                        });
+                        
+                        // Cancel delete
+                        cancelBtn.addEventListener('click', function() {
+                            confirmBtn.remove();
+                            cancelBtn.remove();
+                            btn.style.display = 'inline-block';
+                            if (editBtn) editBtn.style.display = 'inline-block';
+                        });
+                    });
                 });
-            });
-
-            // Delete confirm buttons
-            const confirmBtns = document.querySelectorAll('.material-delete-confirmation .confirm-btn');
-            confirmBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    performMaterialDelete(this.dataset.materialId);
-                });
-            });
-
-            // Delete cancel buttons
-            const cancelBtns = document.querySelectorAll('.material-delete-confirmation .cancel-btn');
-            cancelBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    hideMaterialDeleteConfirmation(this.dataset.materialId);
-                });
-            });
+            }
+            
+            attachDeleteListener();
 
             // Edit modal close button
             const closeBtn = document.querySelector('#editMaterialModal .close');

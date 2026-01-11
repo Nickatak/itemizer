@@ -280,73 +280,39 @@ body {
     box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
-/* Delete Confirmation in Table */
-.material-delete-confirmation {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    padding: 8px;
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-    border-radius: 4px;
-    animation: slideIn 0.3s ease-out;
-    font-size: 0.85em;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 10;
-    white-space: nowrap;
-    min-width: 300px;
-}
-
-.material-delete-confirmation.hidden {
-    display: none;
-}
-
-.material-delete-confirmation .confirmation-text {
-    color: #ff6b6b;
-    flex: 1;
-}
-
-.material-delete-confirmation .confirm-btn,
-.material-delete-confirmation .cancel-btn {
-    padding: 4px 8px;
-    font-size: 0.8em;
+.material-actions-cell .confirm-delete-btn {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white;
     border: none;
-    border-radius: 3px;
+    padding: 6px 12px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 0.85em;
+    transition: all 0.3s;
+    margin-right: 4px;
 }
 
-.material-delete-confirmation .confirm-btn {
-    background: rgba(220, 53, 69, 0.5);
-    color: #ff6b6b;
+.material-actions-cell .confirm-delete-btn:hover {
+    background: linear-gradient(135deg, #bd2130 0%, #a02622 100%) !important;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
-.material-delete-confirmation .confirm-btn:hover {
-    background: rgba(220, 53, 69, 0.7);
+.material-actions-cell .cancel-delete-btn {
+    background: linear-gradient(135deg, #00cc6a 0%, #009d52 100%) !important;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: all 0.3s;
 }
 
-.material-delete-confirmation .cancel-btn {
-    background: rgba(0, 255, 136, 0.3);
-    color: #00ff88;
+.material-actions-cell .cancel-delete-btn:hover {
+    background: linear-gradient(135deg, #009d52 0%, #007a3f 100%) !important;
+    box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
 }
 
-.material-delete-confirmation .cancel-btn:hover {
-    background: rgba(0, 255, 136, 0.5);
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 /* No Materials */
 .no-materials {
@@ -383,11 +349,6 @@ body {
 
     .material-tags-cell {
         max-width: 120px;
-    }
-
-    .material-delete-confirmation {
-        min-width: 250px;
-        right: -50px;
     }
 }
 
