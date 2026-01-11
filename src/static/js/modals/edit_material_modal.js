@@ -147,7 +147,6 @@ function submitEditMaterialForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Material updated successfully!');
             closeEditMaterialModal();
             // Reload page to see updates
             location.reload();

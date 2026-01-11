@@ -83,7 +83,6 @@ function submitEditMaterialForm(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Material updated successfully!');
             closeEditMaterialModal();
             location.reload();
         } else {

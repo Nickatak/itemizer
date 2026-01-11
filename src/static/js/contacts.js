@@ -81,7 +81,6 @@ function submitEditContactForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Contact updated successfully!');
             closeContactModal();
             // Reload page to see updates
             location.reload();

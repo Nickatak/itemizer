@@ -166,6 +166,22 @@ document.addEventListener('DOMContentLoaded', function() {
         closeEditTaskBtn.addEventListener('click', closeEditTaskModal);
     }
     
+    // Edit task modal click outside to close
+    const editTaskModal = document.getElementById('editTaskModal');
+    if (editTaskModal) {
+        editTaskModal.addEventListener('mousedown', function(e) {
+            if (e.target === this) {
+                closeEditTaskModal();
+            }
+        });
+        
+        const modalContent = editTaskModal.querySelector(':scope > div');
+        if (modalContent) {
+            modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
+            modalContent.addEventListener('click', (e) => e.stopPropagation());
+        }
+    }
+    
     // Add material button
     const addMaterialBtn = document.querySelector('.add-material-btn');
     if (addMaterialBtn) {
@@ -377,12 +393,7 @@ function submitEditTaskForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Task updated successfully!');
-            closeTaskModal();
-            // Reset forms
-            document.getElementById('createTaskForm').style.display = 'block';
-            document.getElementById('editTaskForm').style.display = 'none';
-            document.getElementById('taskModalTitle').textContent = 'Add New Task';
+            closeEditTaskModal();
             // Reload page to see updates
             location.reload();
         } else {
@@ -694,7 +705,6 @@ function submitEditMaterialForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Material updated successfully!');
             closeEditMaterialModal();
             location.reload();
         } else {
