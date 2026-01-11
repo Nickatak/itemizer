@@ -799,3 +799,18 @@ body {
 .close:hover {
     color: #ffffff;
 }
+/* Hidden utility class */
+.hidden {
+    display: none !important;
+}
+
+/* No search results message */
+.no-search-results {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.no-search-results td {
+    padding: 20px;
+}

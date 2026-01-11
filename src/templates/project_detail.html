@@ -340,27 +340,27 @@
                 </div>
                 <div class="button-group">
                     <button type="submit">Save Changes</button>
-                    <button type="button" class="cancel-btn" onclick="closeEditTaskModal();">Cancel</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Material Selection Modal -->
-    <div id="materialModal" onmousedown="if(event.currentTarget === event.target) closeMaterialModal();">
-        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeMaterialModal()">&times;</span>
+    <div id="materialModal">
+        <div>
+            <span class="close">&times;</span>
             <h2 id="materialModalTitle">Add Material to Project</h2>
 
             <!-- Tab Navigation -->
             <div class="material-modal-tabs">
-                <button id="searchTab" class="tab-button active" onclick="showMaterialTab('search')">Search Materials</button>
-                <button id="createTab" class="tab-button" onclick="showMaterialTab('create')">Create New Material</button>
+                <button id="searchTab" class="tab-button active" data-tab="search">Search Materials</button>
+                <button id="createTab" class="tab-button" data-tab="create">Create New Material</button>
             </div>
 
             <!-- Search Tab Content -->
             <div id="searchContent" class="tab-content">
-                <div style="margin-bottom: 20px;">
+                <div class="material-search-container">
                     <input type="text" id="materialSearch" placeholder="Search materials...">
                 </div>
                 <div id="materialsList">
@@ -452,7 +452,7 @@
                         <label class="contact-option-label">Associated Contact (Optional)</label>
                         <div>
                             <label class="contact-option-small-label">Choose an option:</label>
-                            <select id="contact_option" class="contact-option-select" onchange="handleContactOption()">
+                            <select id="contact_option" class="contact-option-select">
                                 <option value="none">None</option>
                                 <option value="select">Select Existing Contact</option>
                                 <option value="create">Create New Contact</option>
@@ -495,9 +495,9 @@
     </div>
 
     <!-- Edit Material Modal -->
-    <div id="editMaterialModal" onmousedown="if(event.currentTarget === event.target) closeEditMaterialModal();">
-        <div onmousedown="event.stopPropagation()" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeEditMaterialModal()">&times;</span>
+    <div id="editMaterialModal">
+        <div>
+            <span class="close">&times;</span>
             <h2>Edit Material</h2>
 
             <form id="editMaterialForm">
@@ -557,99 +557,11 @@
                 </div>
                 <div class="material-button-group">
                     <button type="submit">Save Changes</button>
-                    <button type="button" onclick="closeEditMaterialModal();">Cancel</button>
+                    <button type="button">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
-        let newTags = {};
-        
-        document.getElementById('create-tag-btn').addEventListener('click', function() {
-            const tagName = document.getElementById('new_tag_name').value.trim();
-            const tagColor = document.getElementById('new_tag_color').value;
-            
-            if (!tagName) {
-                alert('Please enter a tag name');
-                return;
-            }
-            
-            // Check if tag already exists in the existing tags list
-            const existingCheckboxes = document.querySelectorAll('#tags-list input[type="checkbox"]');
-            for (let checkbox of existingCheckboxes) {
-                const label = checkbox.closest('label');
-                const tagSpan = label.querySelector('span');
-                if (tagSpan.textContent === tagName) {
-                    // Tag exists, just check it
-                    checkbox.checked = true;
-                    document.getElementById('new_tag_name').value = '';
-                    document.getElementById('new_tag_color').value = '#00ff88';
-                    alert(`Tag "${tagName}" already exists and has been selected.`);
-                    return;
-                }
-            }
-            
-            // Check if tag already exists in new tags
-            for (let tagId in newTags) {
-                if (newTags[tagId].name === tagName) {
-                    alert(`Tag "${tagName}" has already been created in this form.`);
-                    return;
-                }
-            }
-            
-            // Create new tag
-            const tagId = 'new_' + Object.keys(newTags).length;
-            newTags[tagId] = { name: tagName, color: tagColor };
-            
-            const container = document.getElementById('new-tags-container');
-            const label = document.createElement('label');
-            label.style.cssText = 'display: flex; align-items: center; color: #e0e0e0; cursor: pointer; margin: 0; padding: 10px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px;';
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = 'tags';
-            checkbox.value = tagId;
-            checkbox.checked = true;
-            checkbox.style.cssText = 'margin-right: 10px; cursor: pointer; width: 18px; height: 18px;';
-            
-            const span = document.createElement('span');
-            span.textContent = tagName;
-            span.style.cssText = `padding: 4px 12px; border-radius: 20px; color: white; font-size: 0.9em; background-color: ${tagColor};`;
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.textContent = '✕';
-            removeBtn.style.cssText = 'margin-left: auto; background: rgba(255, 255, 255, 0.2); color: #ff6b6b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 14px;';
-            removeBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                label.remove();
-                delete newTags[tagId];
-            });
-            
-            label.appendChild(checkbox);
-            label.appendChild(span);
-            label.appendChild(removeBtn);
-            container.appendChild(label);
-            
-            document.getElementById('new_tag_name').value = '';
-            document.getElementById('new_tag_color').value = '#00ff88';
-        });
-        
-        // Handle form submission to include new tags data
-        const form = document.querySelector('form[action="/materials"]');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                // Add hidden inputs for new tags
-                Object.keys(newTags).forEach(function(tagId) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'new_tags[]';
-                    input.value = JSON.stringify({id: tagId, name: newTags[tagId].name, color: newTags[tagId].color});
-                    form.appendChild(input);
-                });
-            });
-        }
-    </script>
 </body>
 </html>

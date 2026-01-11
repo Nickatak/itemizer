@@ -95,6 +95,94 @@ function submitEditContactForm() {
     });
 }
 
+// Sort dropdown change handler
+document.addEventListener('DOMContentLoaded', function() {
+    const sortDropdown = document.getElementById('sort-dropdown');
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', function() {
+            window.location.href = '/contacts?sort=' + this.value;
+        });
+    }
+    
+    // Create contact button
+    const createContactBtn = document.getElementById('create-contact');
+    if (createContactBtn) {
+        createContactBtn.addEventListener('click', openContactModal);
+    }
+    
+    // Contact modal close button
+    const modalCloseBtn = document.querySelector('#contactModal .modal-close');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeContactModal);
+    }
+    
+    // Contact modal cancel button
+    const modalCancelBtn = document.querySelector('#contactModal .modal-cancel-btn');
+    if (modalCancelBtn) {
+        modalCancelBtn.addEventListener('click', function() {
+            closeContactModal();
+            document.getElementById('createContactForm').style.display = 'block';
+            document.getElementById('editContactForm').style.display = 'none';
+            document.getElementById('contactModalTitle').textContent = 'Add Contact';
+        });
+    }
+    
+    // Edit contact buttons
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const contactId = this.dataset.contactId;
+            const name = this.dataset.contactName;
+            const email = this.dataset.contactEmail;
+            const phone = this.dataset.contactPhone;
+            const website = this.dataset.contactWebsite;
+            const notes = this.dataset.contactNotes;
+            const isStore = this.dataset.contactStore === 'true';
+            openEditContactModal(contactId, name, email, phone, website, notes, isStore);
+        });
+    });
+    
+    // Delete buttons confirmation
+    const deleteButtons = document.querySelectorAll('.delete-btn[data-delete-confirm]');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Delete this contact? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+
+// Delete confirmation handler
+function handleDeleteContact(event) {
+    return confirm('Delete this contact? This action cannot be undone.');
+}
+
+// Edit contact button handler
+function handleEditContact(event, contactId, name, email, phone, website, notes, isStore) {
+    event.preventDefault();
+    openEditContactModal(contactId, name, email, phone, website, notes, isStore);
+}
+
+// Modal event delegation
+document.addEventListener('click', function(event) {
+    const contactModal = document.getElementById('contactModal');
+    if (!contactModal) return;
+    
+    // Close modal when clicking outside (on modal background)
+    if (event.target === contactModal) {
+        closeContactModal();
+    }
+});
+
+// Modal inner content click handler - stop propagation
+document.addEventListener('mousedown', function(event) {
+    const modalContent = event.target.closest('#contactModal > div');
+    if (modalContent && event.target === modalContent) {
+        event.stopPropagation();
+    }
+});
+
 // Close modal when clicking outside
 window.onclick = function(event) {
     const contactModal = document.getElementById('contactModal');

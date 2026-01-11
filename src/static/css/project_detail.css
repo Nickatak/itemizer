@@ -521,6 +521,11 @@ body {
 
 .tab-content {
     padding: 20px 0;
+    display: none;
+}
+
+.tab-content:first-of-type {
+    display: block;
 }
 
 #materialSearch {

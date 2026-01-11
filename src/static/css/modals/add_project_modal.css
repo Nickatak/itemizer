@@ -40,6 +40,10 @@
     color: #ffffff;
 }
 
+.modal-content h2 {
+    margin-bottom: 20px;
+}
+
 .form-group {
     margin-bottom: 20px;
 }

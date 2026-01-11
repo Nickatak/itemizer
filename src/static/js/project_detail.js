@@ -154,7 +154,13 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAddTaskBtn.addEventListener('click', closeAddTaskModal);
     }
     
-    // Close edit task modal
+    // Close edit task modal cancel button
+    const closeEditTaskCancelBtn = document.querySelector('#editTaskModal .cancel-btn');
+    if (closeEditTaskCancelBtn) {
+        closeEditTaskCancelBtn.addEventListener('click', closeEditTaskModal);
+    }
+    
+    // Close edit task modal close button
     const closeEditTaskBtn = document.querySelector('#editTaskModal .close');
     if (closeEditTaskBtn) {
         closeEditTaskBtn.addEventListener('click', closeEditTaskModal);
@@ -164,6 +170,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const addMaterialBtn = document.querySelector('.add-material-btn');
     if (addMaterialBtn) {
         addMaterialBtn.addEventListener('click', openMaterialModal);
+    }
+    
+    // Material modal close button
+    const closeMaterialBtn = document.querySelector('#materialModal .close');
+    if (closeMaterialBtn) {
+        closeMaterialBtn.addEventListener('click', closeMaterialModal);
+    }
+    
+    // Edit material modal close button
+    const closeEditMaterialBtn = document.querySelector('#editMaterialModal .close');
+    if (closeEditMaterialBtn) {
+        closeEditMaterialBtn.addEventListener('click', closeEditMaterialModal);
+    }
+    
+    // Edit material modal cancel button
+    const editMaterialCancelBtn = document.querySelector('#editMaterialModal .material-button-group button:last-of-type');
+    if (editMaterialCancelBtn) {
+        editMaterialCancelBtn.addEventListener('click', closeEditMaterialModal);
+    }
+    
+    // Material modal tab buttons
+    const tabButtons = document.querySelectorAll('#materialModal .tab-button');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            showMaterialTab(this.dataset.tab);
+        });
+    });
+    
+    // Material modal click outside to close
+    const materialModal = document.getElementById('materialModal');
+    if (materialModal) {
+        materialModal.addEventListener('mousedown', function(e) {
+            if (e.target === this) {
+                closeMaterialModal();
+            }
+        });
+        
+        const modalContent = materialModal.querySelector(':scope > div');
+        if (modalContent) {
+            modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
+            modalContent.addEventListener('click', (e) => e.stopPropagation());
+        }
+    }
+    
+    // Edit material modal click outside to close
+    const editMaterialModal = document.getElementById('editMaterialModal');
+    if (editMaterialModal) {
+        editMaterialModal.addEventListener('mousedown', function(e) {
+            if (e.target === this) {
+                closeEditMaterialModal();
+            }
+        });
+        
+        const modalContent = editMaterialModal.querySelector(':scope > div');
+        if (modalContent) {
+            modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
+            modalContent.addEventListener('click', (e) => e.stopPropagation());
+        }
     }
     
     // Difficulty buttons
@@ -241,25 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Modal stop propagation
-    const modals = document.querySelectorAll('[id$="Modal"]');
-    modals.forEach(modal => {
-        modal.addEventListener('mousedown', function(e) {
-            if (e.target === this) {
-                if (this.id === 'addTaskModal') closeAddTaskModal();
-                if (this.id === 'editTaskModal') closeEditTaskModal();
-                if (this.id === 'editMaterialModal') closeEditMaterialModal();
-                if (this.id === 'addMaterialModal') closeMaterialModal();
-            }
-        });
-        
-        const modalContent = modal.querySelector(':scope > div');
-        if (modalContent) {
-            modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
-            modalContent.addEventListener('click', (e) => e.stopPropagation());
-        }
-    });
-    
     // Toggle completed tasks checkbox
     const toggleCompletedCheckbox = document.getElementById('toggleCompletedTasks');
     if (toggleCompletedCheckbox) {
@@ -283,6 +328,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('edit_task_completion_percentage').value = '100';
             }
         });
+    }
+    
+    // Tag creation button
+    const createTagBtn = document.getElementById('create-tag-btn');
+    if (createTagBtn) {
+        createTagBtn.addEventListener('click', createNewTag);
+    }
+    
+    // Material form submission for new tags
+    const materialForm = document.querySelector('form[action="/materials"]');
+    if (materialForm) {
+        materialForm.addEventListener('submit', handleMaterialFormSubmission);
+    }
+    
+    // Contact option select
+    const contactOption = document.getElementById('contact_option');
+    if (contactOption) {
+        contactOption.addEventListener('change', handleContactOption);
     }
 });
 
@@ -329,6 +392,328 @@ function submitEditTaskForm() {
     .catch(error => {
         console.error('Error:', error);
         alert('Error updating task');
+    });
+}
+
+// Tag management variables and handlers
+let newTags = {};
+
+function createNewTag() {
+    const tagName = document.getElementById('new_tag_name').value.trim();
+    const tagColor = document.getElementById('new_tag_color').value;
+    
+    if (!tagName) {
+        alert('Please enter a tag name');
+        return;
+    }
+    
+    // Check if tag already exists in the existing tags list
+    const existingCheckboxes = document.querySelectorAll('#tags-list input[type="checkbox"]');
+    for (let checkbox of existingCheckboxes) {
+        const label = checkbox.closest('label');
+        const tagSpan = label.querySelector('span');
+        if (tagSpan.textContent === tagName) {
+            // Tag exists, just check it
+            checkbox.checked = true;
+            document.getElementById('new_tag_name').value = '';
+            document.getElementById('new_tag_color').value = '#00ff88';
+            alert(`Tag "${tagName}" already exists and has been selected.`);
+            return;
+        }
+    }
+    
+    // Check if tag already exists in new tags
+    for (let tagId in newTags) {
+        if (newTags[tagId].name === tagName) {
+            alert(`Tag "${tagName}" has already been created in this form.`);
+            return;
+        }
+    }
+    
+    // Create new tag
+    const tagId = 'new_' + Object.keys(newTags).length;
+    newTags[tagId] = { name: tagName, color: tagColor };
+    
+    const container = document.getElementById('new-tags-container');
+    const label = document.createElement('label');
+    label.className = 'new-tag-label';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'tags';
+    checkbox.value = tagId;
+    checkbox.checked = true;
+    checkbox.className = 'new-tag-checkbox';
+    
+    const span = document.createElement('span');
+    span.textContent = tagName;
+    span.className = 'new-tag-badge';
+    span.style.backgroundColor = tagColor;
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '✕';
+    removeBtn.className = 'new-tag-remove-btn';
+    removeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        label.remove();
+        delete newTags[tagId];
+    });
+    
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    label.appendChild(removeBtn);
+    container.appendChild(label);
+    
+    document.getElementById('new_tag_name').value = '';
+    document.getElementById('new_tag_color').value = '#00ff88';
+}
+
+function handleMaterialFormSubmission(e) {
+    // Add hidden inputs for new tags
+    Object.keys(newTags).forEach((tagId) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'new_tags[]';
+        input.value = JSON.stringify({id: tagId, name: newTags[tagId].name, color: newTags[tagId].color});
+        e.target.appendChild(input);
+    });
+}
+
+// Material Modal Functions
+function openMaterialModal() {
+    const modal = document.getElementById('materialModal');
+    if (modal) modal.style.display = 'block';
+    showMaterialTab('search');
+}
+
+function closeMaterialModal() {
+    const modal = document.getElementById('materialModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function showMaterialTab(tabName) {
+    // Get the material modal
+    const materialModal = document.getElementById('materialModal');
+    if (!materialModal) return;
+    
+    // Hide all tab contents within the material modal
+    const tabContents = materialModal.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Remove active state from all tabs within the material modal
+    const tabButtons = materialModal.querySelectorAll('.tab-button');
+    tabButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab and mark as active
+    const selectedContent = document.getElementById(tabName + 'Content');
+    if (selectedContent) {
+        selectedContent.style.display = 'block';
+    }
+    
+    const selectedTab = document.getElementById(tabName + 'Tab');
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+}
+
+// Edit Material Modal Functions
+function openEditMaterialModal(materialId, name, description, price, link, specificationNotes, tagIds) {
+    const modal = document.getElementById('editMaterialModal');
+    if (modal) modal.style.display = 'block';
+    
+    // Populate form fields
+    document.getElementById('editMaterialId').value = materialId;
+    document.getElementById('edit_material_name').value = name;
+    document.getElementById('edit_material_description').value = description;
+    document.getElementById('edit_material_price').value = price;
+    document.getElementById('edit_material_link').value = link;
+    document.getElementById('edit_material_specification_notes').value = specificationNotes;
+    
+    // Set tag checkboxes
+    const tagCheckboxes = document.querySelectorAll('#edit_tags-list input[type="checkbox"]');
+    tagCheckboxes.forEach(checkbox => {
+        checkbox.checked = tagIds.includes(parseInt(checkbox.value));
+    });
+}
+
+function closeEditMaterialModal() {
+    const modal = document.getElementById('editMaterialModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Contact Option Handler
+function handleContactOption() {
+    const option = document.getElementById('contact_option').value;
+    const selectDiv = document.getElementById('select_contact_div');
+    const createDiv = document.getElementById('create_contact_div');
+    
+    if (selectDiv) selectDiv.style.display = option === 'select' ? 'block' : 'none';
+    if (createDiv) createDiv.style.display = option === 'create' ? 'block' : 'none';
+}
+
+// Modal binding helpers
+function bindAddTaskModalListeners() {
+    const form = document.getElementById('createTaskForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Let form submit normally
+        });
+    }
+}
+
+function bindEditTaskModalListeners() {
+    // Already handled in DOMContentLoaded
+}
+
+function bindMaterialModalListeners() {
+    const searchInput = document.getElementById('materialSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const materials = document.querySelectorAll('.material-item');
+            materials.forEach(material => {
+                const name = material.dataset.name || '';
+                const description = material.dataset.description || '';
+                const matches = name.includes(searchTerm) || description.includes(searchTerm);
+                material.style.display = matches ? 'block' : 'none';
+            });
+        });
+    }
+}
+
+function bindEditMaterialModalListeners() {
+    const editCreateTagBtn = document.getElementById('edit_create-tag-btn');
+    if (editCreateTagBtn) {
+        editCreateTagBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            createEditNewTag();
+        });
+    }
+    
+    const editForm = document.getElementById('editMaterialForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitEditMaterialForm();
+        });
+    }
+}
+
+function createEditNewTag() {
+    const tagName = document.getElementById('edit_new_tag_name').value.trim();
+    const tagColor = document.getElementById('edit_new_tag_color').value;
+    
+    if (!tagName) {
+        alert('Please enter a tag name');
+        return;
+    }
+    
+    // Check if tag already exists in the existing tags list
+    const existingCheckboxes = document.querySelectorAll('#edit_tags-list input[type="checkbox"]');
+    for (let checkbox of existingCheckboxes) {
+        const label = checkbox.closest('label');
+        const tagSpan = label.querySelector('span');
+        if (tagSpan.textContent === tagName) {
+            checkbox.checked = true;
+            document.getElementById('edit_new_tag_name').value = '';
+            document.getElementById('edit_new_tag_color').value = '#00ff88';
+            alert(`Tag "${tagName}" already exists and has been selected.`);
+            return;
+        }
+    }
+    
+    // Check if tag already exists in new tags
+    for (let tagId in newTags) {
+        if (newTags[tagId].name === tagName) {
+            alert(`Tag "${tagName}" has already been created in this form.`);
+            return;
+        }
+    }
+    
+    // Create new tag
+    const tagId = 'edit_new_' + Object.keys(newTags).length;
+    newTags[tagId] = { name: tagName, color: tagColor };
+    
+    const container = document.getElementById('edit_new-tags-container');
+    const label = document.createElement('label');
+    label.className = 'new-tag-label';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'edit_tags';
+    checkbox.value = tagId;
+    checkbox.checked = true;
+    checkbox.className = 'new-tag-checkbox';
+    
+    const span = document.createElement('span');
+    span.textContent = tagName;
+    span.className = 'new-tag-badge';
+    span.style.backgroundColor = tagColor;
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '✕';
+    removeBtn.className = 'new-tag-remove-btn';
+    removeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        label.remove();
+        delete newTags[tagId];
+    });
+    
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    label.appendChild(removeBtn);
+    container.appendChild(label);
+    
+    document.getElementById('edit_new_tag_name').value = '';
+    document.getElementById('edit_new_tag_color').value = '#00ff88';
+}
+
+function submitEditMaterialForm() {
+    const materialId = document.getElementById('editMaterialId').value;
+    const name = document.getElementById('edit_material_name').value;
+    const description = document.getElementById('edit_material_description').value;
+    const price = document.getElementById('edit_material_price').value;
+    const link = document.getElementById('edit_material_link').value;
+    const specificationNotes = document.getElementById('edit_material_specification_notes').value;
+    
+    // Get selected tag IDs
+    const tagCheckboxes = document.querySelectorAll('#editMaterialForm input[name="edit_tags"]:checked');
+    const tagIds = Array.from(tagCheckboxes).map(cb => cb.value);
+    
+    fetch(`/api/materials/${materialId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: name,
+            description: description,
+            price: price ? parseFloat(price) : null,
+            link: link,
+            specification_notes: specificationNotes,
+            tags: tagIds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Material updated successfully!');
+            closeEditMaterialModal();
+            location.reload();
+        } else {
+            alert('Error updating material: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating material');
     });
 }
 

@@ -31,7 +31,7 @@
 
                 <div class="sort-controls">
                     <label for="sort-dropdown">Sort by:</label>
-                    <select id="sort-dropdown" class="sort-dropdown" onchange="location.href='/contacts?sort=' + this.value">
+                    <select id="sort-dropdown" class="sort-dropdown">
                         <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
                         <option value="name_reverse" {% if current_sort == 'name_reverse' %}selected{% endif %}>Name (Z-A)</option>
                         <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Created (Newest)</option>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             
-            <button id="create-contact" class="create-btn" onclick="openContactModal()">Add Contact</button>
+            <button id="create-contact" class="create-btn">Add Contact</button>
         </div>
 
         <div class="contacts-section">
@@ -98,9 +98,9 @@
                                     <td class="contact-materials-cell">{{ contact.materials|length }}</td>
                                     <td class="contact-tasks-cell">{{ contact.tasks|length }}</td>
                                     <td class="contact-actions-cell">
-                                        <button type="button" onclick="openEditContactModal({{ contact.id }}, '{{ contact.name }}', '{{ contact.email or '' }}', '{{ contact.phone or '' }}', '{{ contact.website or '' }}', '{{ contact.notes or '' }}', {{ contact.is_store|lower }})" class="edit-btn">Edit</button>
+                                        <button type="button" class="edit-btn" data-contact-id="{{ contact.id }}" data-contact-name="{{ contact.name }}" data-contact-email="{{ contact.email or '' }}" data-contact-phone="{{ contact.phone or '' }}" data-contact-website="{{ contact.website or '' }}" data-contact-notes="{{ contact.notes or '' }}" data-contact-store="{{ contact.is_store|lower }}">Edit</button>
                                         <form action="/contact/{{ contact.id }}/delete" method="POST" style="display: inline;">
-                                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this contact? This action cannot be undone.')">Delete</button>
+                                            <button type="submit" class="delete-btn" data-delete-confirm="true">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -118,8 +118,8 @@
 
     <!-- Contact Modal -->
     <div id="contactModal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);">
-        <div onclick="event.stopPropagation()" style="background: rgba(6, 20, 16, 0.95); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);">
-            <span style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;" onclick="closeContactModal()">&times;</span>
+        <div style="background: rgba(6, 20, 16, 0.95); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);">
+            <span class="modal-close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
             <h2 id="contactModalTitle" style="margin-bottom: 20px; color: #ffffff;">Add Contact</h2>
             
             <!-- Create Contact Form -->
@@ -184,7 +184,7 @@
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button type="submit" style="background: #00ff88; color: #000; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Save Changes</button>
-                    <button type="button" onclick="closeContactModal(); document.getElementById('createContactForm').style.display = 'block'; document.getElementById('editContactForm').style.display = 'none'; document.getElementById('contactModalTitle').textContent = 'Add Contact';" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Cancel</button>
+                    <button type="button" class="modal-cancel-btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; flex: 1;">Cancel</button>
                 </div>
             </form>
         </div>
