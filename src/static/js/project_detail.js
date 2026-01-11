@@ -556,16 +556,6 @@ function handleContactOption() {
     if (createDiv) createDiv.style.display = option === 'create' ? 'block' : 'none';
 }
 
-// Modal binding helpers
-function bindAddTaskModalListeners() {
-    const form = document.getElementById('createTaskForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Let form submit normally
-        });
-    }
-}
 
 function bindEditTaskModalListeners() {
     // Already handled in DOMContentLoaded
