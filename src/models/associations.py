@@ -9,13 +9,14 @@ class ProjectMaterial(db.Model):
     material_id = db.Column(db.Integer, db.ForeignKey('material.id'), primary_key=True)
     order = db.Column(db.Integer, default=0)
     count = db.Column(db.Integer, default=1)
+    is_purchased = db.Column(db.Boolean, default=False)
     
     # Relationships
-    project = db.relationship('Project', backref=db.backref('material_associations', cascade='all, delete-orphan'))
-    material = db.relationship('Material', backref=db.backref('project_associations', cascade='all, delete-orphan'))
+    material = db.relationship('Material', back_populates='projects')
+    project = db.relationship('Project', back_populates='materials')
     
     def __repr__(self):
-        return f'<ProjectMaterial project_id={self.project_id} material_id={self.material_id} order={self.order} count={self.count}>'
+        return f'<ProjectMaterial project_id={self.project_id} material_id={self.material_id} order={self.order} count={self.count} is_purchased={self.is_purchased}>'
 
 
 # Association table for many-to-many relationship between Material and Tag

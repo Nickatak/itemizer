@@ -38,9 +38,8 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Price</th>
-                            <th>Status</th>
                             <th>Tags</th>
-                            <th>Created</th>
+                            <th>Last Used</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -62,11 +61,6 @@
                                         <em>N/A</em>
                                     {% endif %}
                                 </td>
-                                <td class="material-status-cell">
-                                    <span class="status-badge {% if material.is_purchased %}purchased{% else %}pending{% endif %}">
-                                        {% if material.is_purchased %}✓ Purchased{% else %}⏳ Pending{% endif %}
-                                    </span>
-                                </td>
                                 <td class="material-tags-cell">
                                     {% if material.tags %}
                                         <div class="tags-container">
@@ -79,7 +73,11 @@
                                     {% endif %}
                                 </td>
                                 <td class="material-created-cell">
-                                    {{ material.created_at.strftime('%b %d %Y') }}
+                                    {% if material.last_used %}
+                                        {{ material.last_used.strftime('%b %d %Y') }}
+                                    {% else %}
+                                        <em>Never</em>
+                                    {% endif %}
                                 </td>
                                 <td class="material-actions-cell">
                                     <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>

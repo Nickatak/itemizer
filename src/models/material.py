@@ -9,11 +9,12 @@ class Material(db.Model):
     price = db.Column(db.Float, default=0.0)
     link = db.Column(db.String(500))
     specification_notes = db.Column(db.Text)
-    is_purchased = db.Column(db.Boolean, default=False)
     
     # Many-to-many relationship with tags
     tags = db.relationship('Tag', secondary=material_tags, backref=db.backref('materials', lazy=True))
     
+    projects = db.relationship('ProjectMaterial', back_populates='material', cascade="all, delete-orphan")
+
     # Many-to-many relationship with contacts
     contacts = db.relationship('Contact', secondary=material_contacts, backref=db.backref('materials', lazy=True))
 
@@ -21,6 +22,8 @@ class Material(db.Model):
     created_by = db.relationship('User', backref=db.backref('materials', lazy=True))
 
     created_at = db.Column(db.DateTime, default=db.func.now())
+    last_used = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
 
     def __repr__(self):
         return f'<Material {self.name}>'

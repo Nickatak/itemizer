@@ -100,32 +100,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for material in project.materials %}
+                                {% for pm in project.materials %}
                                     <tr class="material-row">
                                         <td class="material-name-cell">
-                                            <a href="/material/{{ material.id }}" class="material-link">{{ material.name }}</a>
+                                            <a href="/material/{{ pm.material.id }}" class="material-link">{{ pm.material.name }}</a>
                                         </td>
                                         <td class="material-description-cell">
-                                            {% if material.description %}
-                                                {{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}
+                                            {% if pm.material.description %}
+                                                {{ pm.material.description[:60] }}{% if pm.material.description|length > 60 %}...{% endif %}
                                             {% else %}
                                                 <em>No description</em>
                                             {% endif %}
                                         </td>
                                         <td class="material-price-cell">
-                                            {% if material.price %}
-                                                ${{ "%.2f"|format(material.price) }}
+                                            {% if pm.material.price %}
+                                                ${{ "%.2f"|format(pm.material.price) }}
                                             {% else %}
                                                 <em>N/A</em>
                                             {% endif %}
                                         </td>
                                         <td class="material-action-cell">
-                                            <button type="button" class="edit-material-btn" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or 'null' }}" data-material-link="{{ material.link or '' }}" data-material-specification-notes="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
-                                            <button type="button" class="remove-material-btn" data-material-id="{{ material.id }}">Remove</button>
-                                            <div id="materialDeleteConfirmation-{{ material.id }}" class="material-delete-confirmation hidden">
+                                            <button type="button" class="edit-material-btn" data-material-id="{{ pm.material.id }}" data-material-name="{{ pm.material.name }}" data-material-description="{{ pm.material.description or '' }}" data-material-price="{{ pm.material.price or 'null' }}" data-material-link="{{ pm.material.link or '' }}" data-material-specification-notes="{{ pm.material.specification_notes or '' }}" data-material-tags='{{ pm.material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
+                                            <button type="button" class="remove-material-btn" data-material-id="{{ pm.material.id }}">Remove</button>
+                                            <div id="materialDeleteConfirmation-{{ pm.material.id }}" class="material-delete-confirmation hidden">
                                                 <span class="confirmation-text">Remove this material?</span>
-                                                <button class="action-btn delete-confirm-btn" data-project-id="{{ project.id }}" data-material-id="{{ material.id }}">Yes</button>
-                                                <button class="action-btn cancel-btn" data-material-id="{{ material.id }}">Cancel</button>
+                                                <button class="action-btn delete-confirm-btn" data-project-id="{{ project.id }}" data-material-id="{{ pm.material.id }}">Yes</button>
+                                                <button class="action-btn cancel-btn" data-material-id="{{ pm.material.id }}">Cancel</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -143,7 +143,7 @@
                             <div class="materials-summary-row">
                                 <span class="materials-summary-total-label">Total Materials Cost:</span>
                                 <span class="materials-summary-total-value">
-                                    {% set total = project.materials|sum(attribute='price', start=0) %}
+                                    {% set total = project.materials|sum(attribute='material.price', start=0) %}
                                     ${{ "%.2f"|format(total) }}
                                 </span>
                             </div>
@@ -365,7 +365,8 @@
                 </div>
                 <div id="materialsList">
                     {% for material in materials %}
-                        {% if material not in project.materials %}
+                        {% set material_ids = project.materials|map(attribute='material_id')|list %}
+                        {% if material.id not in material_ids %}
                             <div class="material-item" data-name="{{ material.name.lower() }}" data-description="{{ material.description|lower if material.description else '' }}">
                                 <div>
                                     <div class="material-item-name">{{ material.name }}</div>

@@ -5,7 +5,7 @@ from ..models.material import (
     get_all_materials, get_material_by_id, create_material, 
     update_material, add_tag_to_material, remove_tag_from_material, add_contact_to_material, delete_material
 )
-from ..models.project import add_material_to_project, remove_material_from_project
+from ..models.project import add_material_to_project
 from ..models.tag import create_tag
 from ..models.contact import create_contact
 
@@ -23,18 +23,6 @@ def materials_dashboard():
 def delete_material_route(material_id):
     delete_material(material_id)
     return redirect(url_for('materials.materials_dashboard'))
-
-@materials_bp.route('/project/<int:project_id>/add_material/<int:material_id>', methods=['POST'])
-@login_required
-def add_material_to_project_route(project_id, material_id):
-    add_material_to_project(project_id, material_id)
-    return redirect(url_for('projects.project_detail', project_id=project_id))
-
-@materials_bp.route('/project/<int:project_id>/remove_material/<int:material_id>', methods=['POST'])
-@login_required
-def remove_material_from_project_route(project_id, material_id):
-    remove_material_from_project(project_id, material_id)
-    return redirect(url_for('projects.project_detail', project_id=project_id))
 
 @materials_bp.route('/materials', methods=['POST'])
 @login_required

@@ -11,7 +11,7 @@ class Project(db.Model):
     is_complete = db.Column(db.Boolean, default=False)
 
     # Many-to-many relationship with materials through association object
-    materials = db.relationship('Material', secondary='project_materials', backref=db.backref('projects', lazy=True))
+    materials = db.relationship('ProjectMaterial', back_populates='project', cascade="all, delete-orphan")
     
     # One-to-many relationship with tasks - cascade delete
     tasks = db.relationship('Task', backref='project', cascade='all, delete-orphan', lazy=True)
@@ -100,23 +100,26 @@ def delete_project(project_id):
 def add_material_to_project(project_id, material_id):
     project = get_project_by_id(project_id)
     from .material import get_material_by_id
+    from .associations import ProjectMaterial
     material = get_material_by_id(material_id)
     if project and material:
-        if material not in project.materials:
-            project.materials.append(material)
+        # Check if the association already exists
+        existing = ProjectMaterial.query.filter_by(project_id=project_id, material_id=material_id).first()
+        if not existing:
+            project_material = ProjectMaterial(project_id=project_id, material_id=material_id)
+            db.session.add(project_material)
+            material.last_used = db.func.now()
             db.session.commit()
             return True
     return False
 
 def remove_material_from_project(project_id, material_id):
-    project = get_project_by_id(project_id)
-    from .material import get_material_by_id
-    material = get_material_by_id(material_id)
-    if project and material:
-        if material in project.materials:
-            project.materials.remove(material)
-            db.session.commit()
-            return True
+    from .associations import ProjectMaterial
+    project_material = ProjectMaterial.query.filter_by(project_id=project_id, material_id=material_id).first()
+    if project_material:
+        db.session.delete(project_material)
+        db.session.commit()
+        return True
     return False
 
 def get_materials_for_project(project_id):
