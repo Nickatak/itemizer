@@ -12,7 +12,7 @@ class Task(db.Model):
     
     difficulty = db.Column(db.String(50))
     completion_percentage = db.Column(db.Integer, default=0)
-    order = db.Column(db.Integer, default=0, autoincrement=True)
+    order = db.Column(db.Integer, default=1, autoincrement=True)
 
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
