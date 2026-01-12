@@ -717,3 +717,210 @@ function submitEditMaterialForm() {
     });
 }
 
+// Description edit functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editDescriptionBtn');
+    const cancelBtn = document.getElementById('cancelDescriptionBtn');
+    const saveBtn = document.getElementById('saveDescriptionBtn');
+    const descriptionView = document.getElementById('descriptionView');
+    const descriptionEdit = document.getElementById('descriptionEdit');
+    const descriptionTextarea = document.getElementById('descriptionTextarea');
+
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            descriptionView.style.display = 'none';
+            descriptionEdit.style.display = 'block';
+            descriptionTextarea.focus();
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+            descriptionEdit.style.display = 'none';
+            descriptionView.style.display = 'block';
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+            saveField('description', descriptionTextarea.value, descriptionView, descriptionEdit);
+        });
+    }
+
+    // Name edit functionality
+    const editNameBtn = document.getElementById('editNameBtn');
+    const cancelNameBtn = document.getElementById('cancelNameBtn');
+    const saveNameBtn = document.getElementById('saveNameBtn');
+    const nameView = document.getElementById('nameView');
+    const nameEdit = document.getElementById('nameEdit');
+    const nameInput = document.getElementById('nameInput');
+
+    if (editNameBtn) {
+        editNameBtn.addEventListener('click', function() {
+            nameView.style.display = 'none';
+            nameEdit.style.display = 'block';
+            nameInput.focus();
+        });
+    }
+
+    if (cancelNameBtn) {
+        cancelNameBtn.addEventListener('click', function() {
+            nameEdit.style.display = 'none';
+            nameView.style.display = 'block';
+        });
+    }
+
+    if (saveNameBtn) {
+        saveNameBtn.addEventListener('click', function() {
+            saveField('name', nameInput.value, nameView, nameEdit);
+        });
+    }
+
+    // Start Date edit functionality
+    const editStartDateBtn = document.getElementById('editStartDateBtn');
+    const cancelStartDateBtn = document.getElementById('cancelStartDateBtn');
+    const saveStartDateBtn = document.getElementById('saveStartDateBtn');
+    const startDateView = document.getElementById('startDateView');
+    const startDateEdit = document.getElementById('startDateEdit');
+    const startDateInput = document.getElementById('startDateInput');
+
+    if (editStartDateBtn) {
+        editStartDateBtn.addEventListener('click', function() {
+            startDateView.style.display = 'none';
+            startDateEdit.style.display = 'block';
+            startDateInput.focus();
+        });
+    }
+
+    if (cancelStartDateBtn) {
+        cancelStartDateBtn.addEventListener('click', function() {
+            startDateEdit.style.display = 'none';
+            startDateView.style.display = 'block';
+        });
+    }
+
+    if (saveStartDateBtn) {
+        saveStartDateBtn.addEventListener('click', function() {
+            saveField('start_date', startDateInput.value, startDateView, startDateEdit);
+        });
+    }
+
+    // End Date edit functionality
+    const editEndDateBtn = document.getElementById('editEndDateBtn');
+    const cancelEndDateBtn = document.getElementById('cancelEndDateBtn');
+    const saveEndDateBtn = document.getElementById('saveEndDateBtn');
+    const endDateView = document.getElementById('endDateView');
+    const endDateEdit = document.getElementById('endDateEdit');
+    const endDateInput = document.getElementById('endDateInput');
+
+    if (editEndDateBtn) {
+        editEndDateBtn.addEventListener('click', function() {
+            endDateView.style.display = 'none';
+            endDateEdit.style.display = 'block';
+            endDateInput.focus();
+        });
+    }
+
+    if (cancelEndDateBtn) {
+        cancelEndDateBtn.addEventListener('click', function() {
+            endDateEdit.style.display = 'none';
+            endDateView.style.display = 'block';
+        });
+    }
+
+    if (saveEndDateBtn) {
+        saveEndDateBtn.addEventListener('click', function() {
+            saveField('end_date', endDateInput.value, endDateView, endDateEdit);
+        });
+    }
+
+    // Status edit functionality
+    const editStatusBtn = document.getElementById('editStatusBtn');
+    const cancelStatusBtn = document.getElementById('cancelStatusBtn');
+    const saveStatusBtn = document.getElementById('saveStatusBtn');
+    const statusView = document.getElementById('statusView');
+    const statusEdit = document.getElementById('statusEdit');
+    const statusCheckbox = document.getElementById('statusCheckbox');
+
+    if (editStatusBtn) {
+        editStatusBtn.addEventListener('click', function() {
+            statusView.style.display = 'none';
+            statusEdit.style.display = 'block';
+            statusCheckbox.focus();
+        });
+    }
+
+    if (cancelStatusBtn) {
+        cancelStatusBtn.addEventListener('click', function() {
+            statusEdit.style.display = 'none';
+            statusView.style.display = 'block';
+        });
+    }
+
+    if (saveStatusBtn) {
+        saveStatusBtn.addEventListener('click', function() {
+            saveField('is_complete', statusCheckbox.checked, statusView, statusEdit);
+        });
+    }
+
+    // Generic save field function
+    function saveField(fieldName, value, viewElement, editElement) {
+        const projectId = window.location.pathname.split('/').pop();
+
+        const payload = {};
+        payload[fieldName] = value;
+
+        fetch(`/api/projects/${projectId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the display
+                updateFieldDisplay(fieldName, value, viewElement);
+                editElement.style.display = 'none';
+                viewElement.style.display = 'block';
+            } else {
+                alert('Error updating field: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating field');
+        });
+    }
+
+    // Update field display based on field type
+    function updateFieldDisplay(fieldName, value, viewElement) {
+        if (fieldName === 'name') {
+            viewElement.innerHTML = `<div class="name-text">${value || 'Unnamed'}</div>`;
+        } else if (fieldName === 'description') {
+            if (value.trim()) {
+                viewElement.innerHTML = `<div class="description-text">${value}</div>`;
+            } else {
+                viewElement.innerHTML = `<div class="no-description">No description provided.</div>`;
+            }
+        } else if (fieldName === 'start_date' || fieldName === 'end_date') {
+            if (value) {
+                const date = new Date(value);
+                const formatted = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }) + 
+                                ' at ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                viewElement.innerHTML = `<div class="date-text">${formatted}</div>`;
+            } else {
+                const label = fieldName === 'start_date' ? 'Start Date' : 'End Date';
+                viewElement.innerHTML = `<div class="date-text"><em>${label} Undetermined</em></div>`;
+            }
+        } else if (fieldName === 'is_complete') {
+            if (value) {
+                viewElement.innerHTML = `<span class="status-badge completed">✓ Completed</span>`;
+            } else {
+                viewElement.innerHTML = `<span class="status-badge active">In Progress</span>`;
+            }
+        }
+    }
+});
+

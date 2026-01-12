@@ -100,6 +100,40 @@ def api_update_project(project_id):
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
+@api_bp.route('/projects/<int:project_id>', methods=['PATCH'])
+@login_required
+def api_patch_project(project_id):
+    """Partially update a project"""
+    data = request.get_json()
+    project = get_project_by_id(project_id)
+    
+    if not project:
+        return jsonify({'success': False, 'error': 'Project not found'}), 404
+    
+    try:
+        # Only update fields that are provided in the request
+        update_data = {}
+        if 'name' in data:
+            update_data['name'] = data['name']
+        if 'description' in data:
+            update_data['description'] = data['description']
+        if 'start_date' in data:
+            update_data['start_date'] = datetime.fromisoformat(data['start_date']) if data['start_date'] else None
+        if 'end_date' in data:
+            update_data['end_date'] = datetime.fromisoformat(data['end_date']) if data['end_date'] else None
+        if 'is_complete' in data:
+            update_data['is_complete'] = data['is_complete']
+        
+        if update_data:
+            update_project(project_id=project_id, **update_data)
+            db.session.commit()
+        
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
 @api_bp.route('/projects/<int:project_id>', methods=['DELETE'])
 @login_required
 def api_delete_project(project_id):

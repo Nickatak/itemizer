@@ -40,27 +40,6 @@ def project_detail(project_id):
     contacts = get_all_contacts(created_by_id=user_id)
     return render_template('project_detail.html', project=project, materials=materials, tags=tags, contacts=contacts)
 
-@projects_bp.route('/edit-project/<int:project_id>')
-@login_required
-def edit_project(project_id):
-    project = get_project_by_id(project_id)
-    if not project:
-        return render_template('404.html'), 404
-    return render_template('edit_project.html', project=project)
-
-@projects_bp.route('/edit-project/<int:project_id>', methods=['POST'])
-@login_required
-def update_project_route(project_id):
-    name = request.form.get('name')
-    description = request.form.get('description')
-    start_date = request.form.get('start_date')
-    end_date = request.form.get('end_date')
-    is_complete = request.form.get('is_complete') == 'on'
-    
-    if name:
-        update_project(project_id, name, description, start_date, end_date, is_complete)
-    return redirect(url_for('projects.project_detail', project_id=project_id))
-
 @projects_bp.route('/project/<int:project_id>/delete', methods=['POST'])
 @login_required
 def delete_project_route(project_id):
