@@ -11,7 +11,7 @@ projects_bp = Blueprint('projects', __name__)
 @login_required
 def projects():
     sort_by = request.args.get('sort', 'created_at')
-    filter_completed = request.args.get('filter', 'all')
+    filter_completed = request.args.get('filter', 'active')
     user_id = session.get('user_id')
     projects = get_all_projects(sort_by, filter_completed, created_by_id=user_id)
     return render_template('projects.html', projects=projects, current_sort=sort_by, current_filter=filter_completed)
