@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 from ..auth import login_required
 from ...models.project import (
     create_project, get_project_by_id, update_project, delete_project, get_all_projects
@@ -56,8 +56,12 @@ def api_get_project(project_id):
 @api_bp.route('/projects', methods=['GET'])
 @login_required
 def api_list_projects():
-    """List all projects"""
-    projects = get_all_projects()
+    """List all projects with sorting and filtering"""
+    sort_by = request.args.get('sort', 'created_at')
+    filter_completed = request.args.get('filter', 'all')
+    user_id = session.get('user_id')
+    
+    projects = get_all_projects(sort_by=sort_by, filter_completed=filter_completed, created_by_id=user_id)
     return jsonify({
         'success': True,
         'data': [
@@ -67,7 +71,9 @@ def api_list_projects():
                 'description': project.description,
                 'is_complete': project.is_complete,
                 'start_date': project.start_date.isoformat() if project.start_date else None,
-                'end_date': project.end_date.isoformat() if project.end_date else None
+                'end_date': project.end_date.isoformat() if project.end_date else None,
+                'created_at': project.created_at.isoformat() if project.created_at else None,
+                'updated_at': project.updated_at.isoformat() if project.updated_at else None
             }
             for project in projects
         ]
