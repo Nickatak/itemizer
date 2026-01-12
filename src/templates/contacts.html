@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacts - Itemizer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/contacts.js') }}"></script>
 </head>
 <body>
@@ -19,6 +21,13 @@
                 <li><a href="/materials" class="navbar-link">Materials</a></li>
                 <li><a href="/contacts" class="navbar-link active">Contacts</a></li>
             </ul>
+            <div class="navbar-settings">
+                <button class="settings-btn" title="Settings">⚙️</button>
+                <div class="settings-dropdown">
+                    <form method="POST" action="/logout" style="display: none;" id="logout-form"></form>
+                    <button type="submit" form="logout-form" class="dropdown-item">Logout</button>
+                </div>
+            </div>
         </div>
     </nav>
 

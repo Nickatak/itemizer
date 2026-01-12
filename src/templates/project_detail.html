@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ project.name }} - Project Details</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/project_detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/add_task_modal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_task_modal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/material_modal.css') }}">
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals/add_task_modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals/edit_task_modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals/add_material_modal.js') }}"></script>
@@ -15,6 +17,27 @@
     <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="/" class="navbar-logo">📋 Itemizer</a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="/projects" class="navbar-link">Projects</a></li>
+                <li><a href="/materials" class="navbar-link">Materials</a></li>
+                <li><a href="/contacts" class="navbar-link">Contacts</a></li>
+            </ul>
+            <div class="navbar-settings">
+                <button class="settings-btn" title="Settings">⚙️</button>
+                <div class="settings-dropdown">
+                    <form method="POST" action="/logout" style="display: none;" id="logout-form"></form>
+                    <button type="submit" form="logout-form" class="dropdown-item">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
             <div class="header-flex-container">

@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Materials Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_material_modal.css') }}">
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals/edit_material_modal.js') }}"></script>
     <script src="{{ url_for('static', filename='js/materials.js') }}"></script>
 </head>
@@ -21,6 +23,13 @@
                 <li><a href="/materials" class="navbar-link active">Materials</a></li>
                 <li><a href="/contacts" class="navbar-link">Contacts</a></li>
             </ul>
+            <div class="navbar-settings">
+                <button class="settings-btn" title="Settings">⚙️</button>
+                <div class="settings-dropdown">
+                    <form method="POST" action="/logout" style="display: none;" id="logout-form"></form>
+                    <button type="submit" form="logout-form" class="dropdown-item">Logout</button>
+                </div>
+            </div>
         </div>
     </nav>
 
