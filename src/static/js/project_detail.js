@@ -327,6 +327,9 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleCompletedCheckbox.addEventListener('change', toggleCompletedTasks);
     }
     
+    // Initialize drag and drop for tasks
+    initializeTaskDragAndDrop();
+    
     // Edit task form submission
     const editTaskForm = document.getElementById('editTaskForm');
     if (editTaskForm) {
@@ -923,4 +926,168 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// ============================================================
+// DRAG AND DROP FUNCTIONALITY FOR TASKS
+// ============================================================
+
+function initializeTaskDragAndDrop() {
+    const tasksList = document.querySelector('.tasks-list');
+    if (!tasksList) return;
+    
+    const tasks = document.querySelectorAll('.task-card');
+    
+    tasks.forEach((task, index) => {
+        task.draggable = true;
+        
+        task.addEventListener('dragstart', handleTaskDragStart);
+        task.addEventListener('dragend', handleTaskDragEnd);
+        task.addEventListener('dragover', handleTaskDragOver);
+        task.addEventListener('drop', handleTaskDrop);
+        task.addEventListener('dragenter', handleTaskDragEnter);
+        task.addEventListener('dragleave', handleTaskDragLeave);
+    });
+}
+
+let draggedTask = null;
+
+function handleTaskDragStart(e) {
+    draggedTask = this;
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+}
+
+function handleTaskDragEnd(e) {
+    this.classList.remove('dragging');
+    
+    // Remove drag-over class from all tasks
+    document.querySelectorAll('.task-card').forEach(task => {
+        task.classList.remove('drag-over');
+    });
+    
+    draggedTask = null;
+}
+
+function handleTaskDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function handleTaskDragEnter(e) {
+    if (this !== draggedTask) {
+        this.classList.add('drag-over');
+    }
+}
+
+function handleTaskDragLeave(e) {
+    this.classList.remove('drag-over');
+}
+
+function handleTaskDrop(e) {
+    if (e.stopPropagation) {
+        e.stopPropagation();
+    }
+    
+    if (draggedTask !== this && draggedTask) {
+        // Swap positions
+        const tasksList = document.querySelector('.tasks-list');
+        const allTasks = Array.from(tasksList.querySelectorAll('.task-card'));
+        
+        const draggedIndex = allTasks.indexOf(draggedTask);
+        const targetIndex = allTasks.indexOf(this);
+        
+        if (draggedIndex < targetIndex) {
+            this.parentNode.insertBefore(draggedTask, this.nextSibling);
+        } else {
+            this.parentNode.insertBefore(draggedTask, this);
+        }
+        
+        // Update the order numbers and save the new order
+        updateTaskOrderDisplay();
+        saveTaskOrder();
+    }
+    
+    this.classList.remove('drag-over');
+    return false;
+}
+
+function updateTaskOrderDisplay() {
+    const tasks = document.querySelectorAll('.task-card');
+    tasks.forEach((task, index) => {
+        const orderSpan = task.querySelector('.task-order-number');
+        if (orderSpan) {
+            orderSpan.textContent = `#${index + 1}`;
+        }
+    });
+}
+
+function saveTaskOrder() {
+    const tasks = document.querySelectorAll('.task-card');
+    const taskOrder = Array.from(tasks).map((task, index) => {
+        // Extract task ID from data attributes or from edit button
+        const editBtn = task.querySelector('.edit-task-btn-inline');
+        if (editBtn) {
+            return {
+                task_id: parseInt(editBtn.dataset.taskId),
+                new_order: index + 1
+            };
+        }
+    }).filter(item => item !== undefined);
+    
+    if (taskOrder.length === 0) {
+        console.warn('No tasks found to reorder');
+        return;
+    }
+    
+    // Get project ID from URL or data attribute
+    const projectId = window.location.pathname.split('/').pop();
+    
+    // Add visual feedback while saving
+    const tasksList = document.querySelector('.tasks-list');
+    if (tasksList) {
+        tasksList.style.opacity = '0.7';
+    }
+    
+    fetch(`/api/projects/${projectId}/reorder-tasks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            task_order: taskOrder
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Restore visual feedback
+        if (tasksList) {
+            tasksList.style.opacity = '1';
+        }
+        
+        if (data.success) {
+            console.log('Task order saved successfully to database');
+        } else {
+            console.error('Error saving task order:', data.error);
+            alert('Error saving task order: ' + (data.error || 'Unknown error') + '\nPlease try again.');
+        }
+    })
+    .catch(error => {
+        // Restore visual feedback
+        if (tasksList) {
+            tasksList.style.opacity = '1';
+        }
+        
+        console.error('Error:', error);
+        alert('Error saving task order: ' + error.message + '\nChanges may not be persisted.');
+    });
+}
 

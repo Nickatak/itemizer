@@ -69,3 +69,30 @@ def delete_task(task_id):
         db.session.commit()
         return True
     return False
+def update_task_order(task_id, new_order):
+    """Update the order of a task."""
+    task = get_task_by_id(task_id)
+    if task:
+        task.order = new_order
+        db.session.commit()
+    return task
+
+def reorder_tasks(project_id, task_orders):
+    """Reorder multiple tasks in a project.
+    
+    Args:
+        project_id: The ID of the project
+        task_orders: List of dicts with 'task_id' and 'new_order' keys
+    
+    Returns:
+        List of updated tasks
+    """
+    updated_tasks = []
+    for item in task_orders:
+        task_id = item.get('task_id')
+        new_order = item.get('new_order')
+        if task_id and new_order:
+            task = update_task_order(task_id, new_order)
+            if task:
+                updated_tasks.append(task)
+    return updated_tasks

@@ -246,7 +246,10 @@
 
             <div class="detail-section tasks-section">
                 <div class="tasks-header">
-                    <div class="tasks-title">Tasks ({{ project.tasks|length }})</div>
+                    <div>
+                        <div class="tasks-title">Tasks ({{ project.tasks|length }})</div>
+                        {% if project.tasks %}<div class="drag-hint">Drag and drop tasks to reorder them</div>{% endif %}
+                    </div>
                     <div class="tasks-header-flex">
                         <label class="toggle-completed-label">
                             <input type="checkbox" id="toggleCompletedTasks" class="toggle-completed-checkbox">

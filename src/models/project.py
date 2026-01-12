@@ -13,8 +13,8 @@ class Project(db.Model):
     # Many-to-many relationship with materials through association object
     materials = db.relationship('ProjectMaterial', back_populates='project', cascade="all, delete-orphan")
     
-    # One-to-many relationship with tasks - cascade delete
-    tasks = db.relationship('Task', backref='project', cascade='all, delete-orphan', lazy=True)
+    # One-to-many relationship with tasks - cascade delete, ordered by task order
+    tasks = db.relationship('Task', backref='project', cascade='all, delete-orphan', lazy=True, order_by='Task.order')
 
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_by = db.relationship('User', backref=db.backref('projects', lazy=True))

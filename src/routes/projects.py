@@ -57,3 +57,19 @@ def add_material_to_project_route(project_id, material_id):
 def remove_material_from_project_route(project_id, material_id):
     remove_material_from_project(project_id, material_id)
     return redirect(url_for('projects.project_detail', project_id=project_id))
+
+@projects_bp.route('/api/projects/<int:project_id>/reorder-tasks', methods=['POST'])
+@login_required
+def reorder_tasks_route(project_id):
+    """API endpoint to reorder tasks within a project."""
+    data = request.get_json()
+    
+    if not data or 'task_order' not in data:
+        return jsonify({'success': False, 'error': 'Invalid request format'}), 400
+    
+    try:
+        task_orders = data.get('task_order', [])
+        reorder_tasks(project_id, task_orders)
+        return jsonify({'success': True, 'message': 'Tasks reordered successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
