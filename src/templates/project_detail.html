@@ -92,7 +92,7 @@
                     <div id="startDateView">
                         <div class="date-text">
                             {% if project.start_date %}
-                                {{ project.start_date.strftime('%b %d %Y at %-I:%M %p') }}
+                                {{ project.start_date.strftime('%b %d %Y') }}
                             {% else %}
                                 <em>Start Date Undetermined</em>
                             {% endif %}
@@ -123,7 +123,7 @@
                     <div id="endDateView">
                         <div class="date-text">
                             {% if project.end_date %}
-                                {{ project.end_date.strftime('%b %d %Y at %-I:%M %p') }}
+                                {{ project.end_date.strftime('%b %d %Y') }}
                             {% else %}
                                 <em>End Date Undetermined</em>
                             {% endif %}

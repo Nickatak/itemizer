@@ -71,9 +71,9 @@
                                 <div class="project-description">{{ project.description or 'No description provided.' }}</div>
 
                                 <div class="project-info">
-                                    <div>Start: {% if project.start_date %}{{ project.start_date.strftime('%b %d %Y at %-I:%M %p') }}{% else %}TBD{% endif %}</div>
+                                    <div>Start: {% if project.start_date %}{{ project.start_date.strftime('%b %d %Y') }}{% else %}TBD{% endif %}</div>
                                     {% if project.end_date %}
-                                    <div>End: {{ project.end_date.strftime('%b %d %Y at %-I:%M %p') }}</div>
+                                    <div>End: {{ project.end_date.strftime('%b %d %Y') }}</div>
                                     {% endif %}
                                 </div>
                             </div>
