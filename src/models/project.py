@@ -35,9 +35,9 @@ def get_all_projects(sort_by=None, filter_completed=None, created_by_id=None):
         query = query.filter(Project.created_by_id == created_by_id)
     
     if filter_completed == 'completed':
-        query = query.filter(Project.end_date.isnot(None))
+        query = query.filter(Project.is_complete == True)
     elif filter_completed == 'active':
-        query = query.filter(Project.end_date.is_(None))
+        query = query.filter(Project.is_complete == False)
     
     if sort_by == 'title':
         query = query.order_by(Project.name.asc())
