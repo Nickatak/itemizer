@@ -1,5 +1,5 @@
 from . import db
-from .associations import material_tags, material_contacts
+from .associations import material_contacts
 
 class Material(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,9 +9,6 @@ class Material(db.Model):
     price = db.Column(db.Float, default=0.0)
     link = db.Column(db.String(500))
     specification_notes = db.Column(db.Text)
-    
-    # Many-to-many relationship with tags
-    tags = db.relationship('Tag', secondary=material_tags, backref=db.backref('materials', lazy=True))
     
     projects = db.relationship('ProjectMaterial', back_populates='material', cascade="all, delete-orphan")
 
@@ -68,22 +65,6 @@ def delete_material(material_id):
         db.session.commit()
         return True
     return False
-
-def add_tag_to_material(material_id, tag_id):
-    material = get_material_by_id(material_id)
-    from .tag import get_tag_by_id
-    tag = get_tag_by_id(tag_id)
-    if material and tag and tag not in material.tags:
-        material.tags.append(tag)
-        db.session.commit()
-
-def remove_tag_from_material(material_id, tag_id):
-    material = get_material_by_id(material_id)
-    from .tag import get_tag_by_id
-    tag = get_tag_by_id(tag_id)
-    if material and tag and tag in material.tags:
-        material.tags.remove(tag)
-        db.session.commit()
 
 def add_contact_to_material(material_id, contact_id):
     material = get_material_by_id(material_id)

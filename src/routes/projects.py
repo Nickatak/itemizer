@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from .auth import login_required
 from ..models.project import get_all_projects, create_project, get_project_by_id, update_project, delete_project, add_material_to_project, remove_material_from_project
 from ..models.material import get_all_materials
-from ..models.tag import get_all_tags
 from ..models.contact import get_all_contacts
 
 projects_bp = Blueprint('projects', __name__)
@@ -36,9 +35,8 @@ def project_detail(project_id):
         return render_template('404.html'), 404
     user_id = session.get('user_id')
     materials = get_all_materials(created_by_id=user_id)
-    tags = get_all_tags(created_by_id=user_id)
     contacts = get_all_contacts(created_by_id=user_id)
-    return render_template('project_detail.html', project=project, materials=materials, tags=tags, contacts=contacts)
+    return render_template('project_detail.html', project=project, materials=materials, contacts=contacts)
 
 @projects_bp.route('/project/<int:project_id>/delete', methods=['POST'])
 @login_required

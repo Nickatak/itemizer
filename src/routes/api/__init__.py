@@ -9,7 +9,6 @@ from . import projects
 from . import tasks
 from . import materials
 from . import contacts
-from . import tags
 from . import users
 
 # This file serves as the central registration point for all API routes

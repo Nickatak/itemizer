@@ -223,12 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Create tag button
-    const createTagBtn = document.querySelector('#edit_create-tag-btn');
-    if (createTagBtn) {
-        createTagBtn.addEventListener('click', createEditTag);
-    }
-
     // Edit form submission
     const editForm = document.getElementById('editMaterialForm');
     if (editForm) {

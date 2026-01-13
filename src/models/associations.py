@@ -19,12 +19,6 @@ class ProjectMaterial(db.Model):
         return f'<ProjectMaterial project_id={self.project_id} material_id={self.material_id} order={self.order} count={self.count} is_purchased={self.is_purchased}>'
 
 
-# Association table for many-to-many relationship between Material and Tag
-material_tags = db.Table('material_tags',
-    db.Column('material_id', db.Integer, db.ForeignKey('material.id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
-)
-
 # Association table for many-to-many relationship between Task and Contact
 task_contacts = db.Table('task_contacts',
     db.Column('task_id', db.Integer, db.ForeignKey('task.id'), primary_key=True),
