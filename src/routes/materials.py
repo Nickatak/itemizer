@@ -15,7 +15,11 @@ materials_bp = Blueprint('materials', __name__)
 def materials_dashboard():
     user_id = session.get('user_id')
     materials = get_all_materials(created_by_id=user_id)
-    return render_template('materials.html', materials=materials)
+    from ..models.category import get_all_categories
+    user_categories = get_all_categories(created_by_id=user_id)
+    system_categories = get_all_categories(created_by_id=2)
+    categories = user_categories + system_categories
+    return render_template('materials.html', materials=materials, categories=categories)
 
 @materials_bp.route('/material/<int:material_id>/delete', methods=['POST'])
 @login_required
@@ -31,6 +35,7 @@ def create_material_route():
     price = request.form.get('price')
     link = request.form.get('link')
     specification_notes = request.form.get('specification_notes')
+    category_id = request.form.get('category_id')
     project_id = request.form.get('project_id')
     
     # Contact handling
@@ -46,7 +51,7 @@ def create_material_route():
             except ValueError:
                 price_float = None
         user_id = session.get('user_id')
-        material = create_material(name, description, price_float, link, specification_notes, created_by_id=user_id)
+        material = create_material(name, description, price_float, link, specification_notes, created_by_id=user_id, category_id=category_id if category_id else None)
         
         # Handle contact creation or selection
         if contact_option == 'select':
@@ -69,32 +74,3 @@ def create_material_route():
         if project_id:
             add_material_to_project(int(project_id), material.id)
     return redirect(url_for('projects.project_detail', project_id=project_id))
-
-@materials_bp.route('/api/materials/<int:material_id>', methods=['PUT'])
-@login_required
-def api_update_material(material_id):
-    data = request.get_json()
-    
-    name = data.get('name')
-    description = data.get('description')
-    price = data.get('price')
-    link = data.get('link')
-    specification_notes = data.get('specification_notes')
-
-    # Convert price to float if provided
-    price_float = None
-    if price:
-        try:
-            price_float = float(price)
-        except (ValueError, TypeError):
-            price_float = None
-
-    try:
-        if name:
-            update_material(material_id, name, description, price_float, link, specification_notes)
-
-            return jsonify({'success': True, 'message': 'Material updated successfully'})
-        else:
-            return jsonify({'success': False, 'error': 'Material name is required'}), 400
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500

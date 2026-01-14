@@ -49,51 +49,7 @@ function attachDeleteListener() {
     });
 }
 
-function submitEditMaterialForm(e) {
-    e.preventDefault();
-    const materialId = document.getElementById('editMaterialId').value;
-    const name = document.getElementById('edit_material_name').value;
-    const description = document.getElementById('edit_material_description').value;
-    const price = document.getElementById('edit_material_price').value;
-    const link = document.getElementById('edit_material_link').value;
-    const specificationNotes = document.getElementById('edit_material_specification_notes').value;
-    
-    // Get selected tags
-    const tagCheckboxes = document.querySelectorAll('#edit_tags-list input[type="checkbox"]:checked');
-    const tags = Array.from(tagCheckboxes).map(cb => parseInt(cb.value));
-    
-    // Get new tags
-    const newTags = Object.values(editNewTags);
 
-    fetch(`/api/materials/${materialId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            name: name,
-            description: description,
-            price: price ? parseFloat(price) : null,
-            link: link,
-            specification_notes: specificationNotes,
-            tags: tags,
-            new_tags: newTags
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeEditMaterialModal();
-            location.reload();
-        } else {
-            alert('Error updating material: ' + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating material');
-    });
-}
 
 function performSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -106,15 +62,8 @@ function performSearch() {
     materialRows.forEach(row => {
         const name = row.querySelector('.material-name-cell')?.textContent.toLowerCase() || '';
         const description = row.querySelector('.material-description-cell')?.textContent.toLowerCase() || '';
-        const tagsCell = row.querySelector('.material-tags-cell');
-        let tagsText = '';
         
-        if (tagsCell) {
-            const tags = tagsCell.querySelectorAll('.tag');
-            tagsText = Array.from(tags).map(tag => tag.textContent.toLowerCase()).join(' ');
-        }
-        
-        if (name.includes(searchTerm) || description.includes(searchTerm) || tagsText.includes(searchTerm)) {
+        if (name.includes(searchTerm) || description.includes(searchTerm)) {
             row.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -148,47 +97,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const price = this.dataset.materialPrice;
             const link = this.dataset.materialLink;
             const specs = this.dataset.materialSpecs;
-            const tagIds = JSON.parse(this.dataset.materialTags || '[]');
+            const categoryId = this.dataset.materialCategoryId;
             
-            // Fetch all available tags and populate the modal
-            fetch('/api/tags')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.tags) {
-                        const tagsList = document.getElementById('edit_tags-list');
-                        tagsList.innerHTML = '';
-                        
-                        if (data.tags.length === 0) {
-                            const p = document.createElement('p');
-                            p.className = 'no-tags';
-                            p.textContent = 'No tags available. Create one below!';
-                            tagsList.appendChild(p);
-                        } else {
-                            data.tags.forEach(tag => {
-                                const label = document.createElement('label');
-                                const checkbox = document.createElement('input');
-                                checkbox.type = 'checkbox';
-                                checkbox.name = 'edit_tags';
-                                checkbox.value = tag.id;
-                                checkbox.checked = tagIds.includes(tag.id);
-                                
-                                const span = document.createElement('span');
-                                span.className = 'tag-badge';
-                                span.textContent = tag.name;
-                                span.style.backgroundColor = tag.color;
-                                
-                                label.appendChild(checkbox);
-                                label.appendChild(span);
-                                tagsList.appendChild(label);
-                            });
-                        }
-                    }
-                    openEditMaterialModal(materialId, name, description, price, link, specs, tagIds);
-                })
-                .catch(error => {
-                    console.error('Error fetching tags:', error);
-                    openEditMaterialModal(materialId, name, description, price, link, specs, tagIds);
-                });
+            openEditMaterialModal(materialId, name, description, price, link, specs, categoryId);
         });
     });
 
@@ -221,12 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modalContent.addEventListener('mousedown', (e) => e.stopPropagation());
             modalContent.addEventListener('click', (e) => e.stopPropagation());
         }
-    }
-
-    // Edit form submission
-    const editForm = document.getElementById('editMaterialForm');
-    if (editForm) {
-        editForm.addEventListener('submit', submitEditMaterialForm);
     }
 
     // Search functionality

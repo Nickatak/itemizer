@@ -3,6 +3,7 @@ from . import db
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(7), default='#00ff88')
 
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_by = db.relationship('User', backref=db.backref('categories', lazy=True))
@@ -24,8 +25,8 @@ def get_all_categories(created_by_id=None):
 def get_category_by_id(category_id):
     return Category.query.get(category_id)
 
-def create_category(name, description=None, color='#00ff88', created_by_id=None):
-    category = Category(name=name, description=description, color=color, created_by_id=created_by_id)
+def create_category(name, created_by_id=None, color='#00ff88'):
+    category = Category(name=name,  created_by_id=created_by_id, color=color)
     db.session.add(category)
     db.session.commit()
     return category

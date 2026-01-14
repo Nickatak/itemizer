@@ -1,18 +1,19 @@
-"""initial_migration_with_category
+"""initial migration with seed data
 
-Revision ID: f6c33112c164
+Revision ID: e824a1d34bdb
 Revises: 
-Create Date: 2026-01-13 10:53:38.566618
+Create Date: 2026-01-13 15:11:24.887535
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from werkzeug.security import generate_password_hash
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f6c33112c164'
+revision: str = 'e824a1d34bdb'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,9 +34,8 @@ def upgrade() -> None:
     op.create_table('category',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
     sa.Column('color', sa.String(length=7), nullable=True),
-    sa.Column('created_by_id', sa.Integer(), nullable=False),
+    sa.Column('created_by_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['created_by_id'], ['user.id'], ),
@@ -56,19 +56,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
-    op.create_table('material',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('price', sa.Float(), nullable=True),
-    sa.Column('link', sa.String(length=500), nullable=True),
-    sa.Column('specification_notes', sa.Text(), nullable=True),
-    sa.Column('created_by_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('last_used', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['created_by_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('project',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -82,22 +69,20 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['created_by_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('material_contacts',
-    sa.Column('material_id', sa.Integer(), nullable=False),
-    sa.Column('contact_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['contact_id'], ['contact.id'], ),
-    sa.ForeignKeyConstraint(['material_id'], ['material.id'], ),
-    sa.PrimaryKeyConstraint('material_id', 'contact_id')
-    )
-    op.create_table('project_materials',
-    sa.Column('project_id', sa.Integer(), nullable=False),
-    sa.Column('material_id', sa.Integer(), nullable=False),
-    sa.Column('order', sa.Integer(), nullable=True),
-    sa.Column('count', sa.Integer(), nullable=True),
-    sa.Column('is_purchased', sa.Boolean(), nullable=True),
-    sa.ForeignKeyConstraint(['material_id'], ['material.id'], ),
-    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
-    sa.PrimaryKeyConstraint('project_id', 'material_id')
+    op.create_table('material',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('price', sa.Float(), nullable=True),
+    sa.Column('link', sa.String(length=500), nullable=True),
+    sa.Column('specification_notes', sa.Text(), nullable=True),
+    sa.Column('category_id', sa.Integer(), nullable=True),
+    sa.Column('created_by_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('last_used', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
+    sa.ForeignKeyConstraint(['created_by_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('task',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -117,6 +102,23 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('material_contacts',
+    sa.Column('material_id', sa.Integer(), nullable=False),
+    sa.Column('contact_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['contact_id'], ['contact.id'], ),
+    sa.ForeignKeyConstraint(['material_id'], ['material.id'], ),
+    sa.PrimaryKeyConstraint('material_id', 'contact_id')
+    )
+    op.create_table('project_materials',
+    sa.Column('project_id', sa.Integer(), nullable=False),
+    sa.Column('material_id', sa.Integer(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=True),
+    sa.Column('count', sa.Integer(), nullable=True),
+    sa.Column('is_purchased', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['material_id'], ['material.id'], ),
+    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
+    sa.PrimaryKeyConstraint('project_id', 'material_id')
+    )
     op.create_table('task_contacts',
     sa.Column('task_id', sa.Integer(), nullable=False),
     sa.Column('contact_id', sa.Integer(), nullable=False),
@@ -125,17 +127,47 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('task_id', 'contact_id')
     )
     # ### end Alembic commands ###
+    
+    # Insert seed data
+    # Create a default test user for development
+    test_password_hash = generate_password_hash('asdf')
+    op.execute(f"""
+        INSERT INTO user (email, password_hash, created_at, updated_at)
+        VALUES ('asdf@asdf.com', '{test_password_hash}', datetime('now'), datetime('now'))
+    """)
+    
+    # Create system user for default categories
+    op.execute(f"""
+        INSERT INTO user (email, password_hash, created_at, updated_at)
+        VALUES ('system@itemizer.local', 'unlogginable', datetime('now'), datetime('now'))
+    """)
+    
+    # Insert default categories (assigned to system user, which is user_id 2)
+    categories = [
+        ('None', '#808080'),
+        ('Groceries', '#4CAF50'),
+        ('Autos', '#FF9800'),
+        ('Tools', '#2196F3'),
+        ('Tech', '#9C27B0'),
+        ('Personal', '#F44336'),
+    ]
+    
+    for name, color in categories:
+        op.execute(f"""
+            INSERT INTO category (name, color, created_by_id, created_at, updated_at)
+            VALUES ('{name}', '{color}', 2, datetime('now'), datetime('now'))
+        """)
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('task_contacts')
-    op.drop_table('task')
     op.drop_table('project_materials')
     op.drop_table('material_contacts')
-    op.drop_table('project')
+    op.drop_table('task')
     op.drop_table('material')
+    op.drop_table('project')
     op.drop_table('contact')
     op.drop_table('category')
     op.drop_table('user')

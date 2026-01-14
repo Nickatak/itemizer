@@ -10,6 +10,9 @@ class Material(db.Model):
     link = db.Column(db.String(500))
     specification_notes = db.Column(db.Text)
     
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), default=None)
+    category = db.relationship('Category', backref=db.backref('materials', lazy=True))
+    
     projects = db.relationship('ProjectMaterial', back_populates='material', cascade="all, delete-orphan")
 
     # Many-to-many relationship with contacts
@@ -36,13 +39,13 @@ def get_all_materials(created_by_id=None):
 def get_material_by_id(material_id):
     return Material.query.get(material_id)
 
-def create_material(name, description, price=None, link=None, specification_notes=None, created_by_id=None):
-    material = Material(name=name, description=description, price=price, link=link, specification_notes=specification_notes, created_by_id=created_by_id)
+def create_material(name, description, price=None, link=None, specification_notes=None, created_by_id=None, category_id=None):
+    material = Material(name=name, description=description, price=price, link=link, specification_notes=specification_notes, created_by_id=created_by_id, category_id=category_id)
     db.session.add(material)
     db.session.commit()
     return material
 
-def update_material(material_id, name=None, description=None, price=None, link=None, specification_notes=None):
+def update_material(material_id, name=None, description=None, price=None, link=None, specification_notes=None, category_id=...):
     material = get_material_by_id(material_id)
     if material:
         if name is not None:
@@ -55,6 +58,9 @@ def update_material(material_id, name=None, description=None, price=None, link=N
             material.link = link
         if specification_notes is not None:
             material.specification_notes = specification_notes
+        # category_id can be explicitly set to None to clear it, so we check using a sentinel
+        if category_id is not ...:
+            material.category_id = category_id
         db.session.commit()
     return material
 

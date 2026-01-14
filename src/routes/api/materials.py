@@ -89,7 +89,8 @@ def api_update_material(material_id):
             description=data.get('description'),
             price=data.get('price'),
             link=data.get('link'),
-            specification_notes=data.get('specification_notes')
+            specification_notes=data.get('specification_notes'),
+            category_id=data.get('category_id')
         )
         db.session.commit()
         return jsonify({'success': True}), 200

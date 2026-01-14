@@ -30,6 +30,13 @@ function resetMaterialModal() {
     if (createForm) {
         createForm.reset();
     }
+    
+    // Hide new category container
+    const newCategoryContainer = document.getElementById('new_category_container');
+    if (newCategoryContainer) {
+        newCategoryContainer.style.display = 'none';
+        document.getElementById('new_category_name').value = '';
+    }
 }
 
 function showMaterialTab(tabName) {
@@ -128,5 +135,84 @@ function bindMaterialModalListeners() {
     const contactOption = document.getElementById('contact_option');
     if (contactOption) {
         contactOption.addEventListener('change', handleContactOption);
+    }
+    
+    // Bind category dropdown change
+    const categorySelect = document.getElementById('material_category');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function(event) {
+            const newCategoryContainer = document.getElementById('new_category_container');
+            if (newCategoryContainer) {
+                if (event.target.value === '__new__') {
+                    newCategoryContainer.style.display = 'block';
+                    document.getElementById('new_category_name').focus();
+                } else {
+                    newCategoryContainer.style.display = 'none';
+                    document.getElementById('new_category_name').value = '';
+                }
+            }
+        });
+    } else {
+        console.warn('Category select element not found');
+    }
+    
+    // Handle create category button
+    const createCategoryBtn = document.getElementById('create_category_btn');
+    if (createCategoryBtn) {
+        createCategoryBtn.addEventListener('click', function() {
+            const categoryName = document.getElementById('new_category_name').value.trim();
+            
+            if (!categoryName) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            // Create the category via API
+            fetch('/api/categories', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: categoryName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.category) {
+                    // Add new option to select and select it
+                    const option = document.createElement('option');
+                    option.value = data.category.id;
+                    option.textContent = data.category.name;
+                    
+                    const selectElement = document.getElementById('material_category');
+                    const newCategoryOption = selectElement.querySelector('option[value="__new__"]');
+                    selectElement.insertBefore(option, newCategoryOption);
+                    
+                    // Select the new category
+                    selectElement.value = data.category.id;
+                    
+                    // Hide the creation form
+                    document.getElementById('new_category_container').style.display = 'none';
+                    document.getElementById('new_category_name').value = '';
+                } else {
+                    alert('Error creating category: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating category');
+            });
+        });
+    }
+    
+    // Handle cancel button
+    const cancelCategoryBtn = document.getElementById('cancel_new_category_btn');
+    if (cancelCategoryBtn) {
+        cancelCategoryBtn.addEventListener('click', function() {
+            document.getElementById('material_category').value = '';
+            document.getElementById('new_category_container').style.display = 'none';
+            document.getElementById('new_category_name').value = '';
+        });
     }
 }

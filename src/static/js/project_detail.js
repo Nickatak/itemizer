@@ -288,8 +288,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const price = this.dataset.materialPrice;
             const link = this.dataset.materialLink;
             const specificationNotes = this.dataset.materialSpecificationNotes;
-            const tagIds = JSON.parse(this.dataset.materialTags || '[]');
-            openEditMaterialModal(materialId, name, description, price, link, specificationNotes, tagIds);
+            const categoryId = this.dataset.materialCategoryId;
+            openEditMaterialModal(materialId, name, description, price, link, specificationNotes, categoryId);
         });
     });
     
@@ -495,71 +495,7 @@ function handleMaterialFormSubmission(e) {
 }
 
 // Material Modal Functions
-function openMaterialModal() {
-    const modal = document.getElementById('materialModal');
-    if (modal) modal.style.display = 'block';
-    showMaterialTab('search');
-}
-
-function closeMaterialModal() {
-    const modal = document.getElementById('materialModal');
-    if (modal) modal.style.display = 'none';
-}
-
-function showMaterialTab(tabName) {
-    // Get the material modal
-    const materialModal = document.getElementById('materialModal');
-    if (!materialModal) return;
-    
-    // Hide all tab contents within the material modal
-    const tabContents = materialModal.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-        content.style.display = 'none';
-    });
-    
-    // Remove active state from all tabs within the material modal
-    const tabButtons = materialModal.querySelectorAll('.tab-button');
-    tabButtons.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show selected tab and mark as active
-    const selectedContent = document.getElementById(tabName + 'Content');
-    if (selectedContent) {
-        selectedContent.style.display = 'block';
-    }
-    
-    const selectedTab = document.getElementById(tabName + 'Tab');
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-}
-
 // Edit Material Modal Functions
-function openEditMaterialModal(materialId, name, description, price, link, specificationNotes, tagIds) {
-    const modal = document.getElementById('editMaterialModal');
-    if (modal) modal.style.display = 'block';
-    
-    // Populate form fields
-    document.getElementById('editMaterialId').value = materialId;
-    document.getElementById('edit_material_name').value = name;
-    document.getElementById('edit_material_description').value = description;
-    document.getElementById('edit_material_price').value = price;
-    document.getElementById('edit_material_link').value = link;
-    document.getElementById('edit_material_specification_notes').value = specificationNotes;
-    
-    // Set tag checkboxes
-    const tagCheckboxes = document.querySelectorAll('#edit_tags-list input[type="checkbox"]');
-    tagCheckboxes.forEach(checkbox => {
-        checkbox.checked = tagIds.includes(parseInt(checkbox.value));
-    });
-}
-
-function closeEditMaterialModal() {
-    const modal = document.getElementById('editMaterialModal');
-    if (modal) modal.style.display = 'none';
-}
-
 // Contact Option Handler
 function handleContactOption() {
     const option = document.getElementById('contact_option').value;
@@ -573,40 +509,6 @@ function handleContactOption() {
 
 function bindEditTaskModalListeners() {
     // Already handled in DOMContentLoaded
-}
-
-function bindMaterialModalListeners() {
-    const searchInput = document.getElementById('materialSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const materials = document.querySelectorAll('.material-item');
-            materials.forEach(material => {
-                const name = material.dataset.name || '';
-                const description = material.dataset.description || '';
-                const matches = name.includes(searchTerm) || description.includes(searchTerm);
-                material.style.display = matches ? 'block' : 'none';
-            });
-        });
-    }
-}
-
-function bindEditMaterialModalListeners() {
-    const editCreateTagBtn = document.getElementById('edit_create-tag-btn');
-    if (editCreateTagBtn) {
-        editCreateTagBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            createEditNewTag();
-        });
-    }
-    
-    const editForm = document.getElementById('editMaterialForm');
-    if (editForm) {
-        editForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitEditMaterialForm();
-        });
-    }
 }
 
 function createEditNewTag() {
@@ -677,47 +579,6 @@ function createEditNewTag() {
     
     document.getElementById('edit_new_tag_name').value = '';
     document.getElementById('edit_new_tag_color').value = '#00ff88';
-}
-
-function submitEditMaterialForm() {
-    const materialId = document.getElementById('editMaterialId').value;
-    const name = document.getElementById('edit_material_name').value;
-    const description = document.getElementById('edit_material_description').value;
-    const price = document.getElementById('edit_material_price').value;
-    const link = document.getElementById('edit_material_link').value;
-    const specificationNotes = document.getElementById('edit_material_specification_notes').value;
-    
-    // Get selected tag IDs
-    const tagCheckboxes = document.querySelectorAll('#editMaterialForm input[name="edit_tags"]:checked');
-    const tagIds = Array.from(tagCheckboxes).map(cb => cb.value);
-    
-    fetch(`/api/materials/${materialId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            name: name,
-            description: description,
-            price: price ? parseFloat(price) : null,
-            link: link,
-            specification_notes: specificationNotes,
-            tags: tagIds
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeEditMaterialModal();
-            location.reload();
-        } else {
-            alert('Error updating material: ' + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating material');
-    });
 }
 
 // Description edit functionality

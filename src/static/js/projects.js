@@ -8,8 +8,6 @@ window.onload = () => {
 
     readProjects(allProjIds, projects);
 
-    console.log(allProjIds, projects);
-
 }
 
 /**

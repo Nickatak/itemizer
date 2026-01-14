@@ -1,0 +1,146 @@
+/* Edit Material Modal Styles */
+
+#editMaterialModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#editMaterialModal > div {
+    background: rgba(6, 20, 16, 0.95);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#editMaterialModal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+#editMaterialModal .close:hover {
+    color: #ffffff;
+}
+
+#editMaterialModal h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+#editMaterialForm div {
+    margin-bottom: 20px;
+}
+
+#editMaterialForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+#editMaterialForm input[type="text"],
+#editMaterialForm input[type="email"],
+#editMaterialForm input[type="tel"],
+#editMaterialForm input[type="number"],
+#editMaterialForm input[type="url"],
+#editMaterialForm textarea,
+#editMaterialForm select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+
+#editMaterialForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#editMaterialForm select option {
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+/* Material Search Container */
+.material-search-container {
+    margin-bottom: 20px;
+}
+
+/* Category Selection Styles */
+#material_category,
+.material-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+#material_category:hover,
+.material-select:hover {
+    border-color: rgba(0, 255, 136, 0.3);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#material_category:focus,
+.material-select:focus {
+    outline: none;
+    border-color: rgba(0, 255, 136, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#material_category option,
+.material-select option {
+    background: #061410;
+    color: #ffffff;
+    padding: 10px;
+    border: none;
+    margin: 5px 0;
+}
+
+#material_category option:hover,
+.material-select option:hover {
+    background: #0a3d2f;
+    color: #00ff88;
+}
+
+#material_category option:checked,
+.material-select option:checked {
+    background: linear-gradient(#0a3d2f, #0a3d2f);
+    background-color: #0a3d2f;
+    color: #00ff88;
+}
+
+#material_category option:disabled,
+.material-select option:disabled {
+    color: #666;
+}

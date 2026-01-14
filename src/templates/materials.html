@@ -6,6 +6,7 @@
     <title>Materials Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/add_material_modal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_material_modal.css') }}">
     <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/modals/edit_material_modal.js') }}"></script>
@@ -48,7 +49,7 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Price</th>
-                            <th>Tags</th>
+                            <th>Category</th>
                             <th>Last Used</th>
                             <th>Actions</th>
                         </tr>
@@ -71,15 +72,11 @@
                                         <em>N/A</em>
                                     {% endif %}
                                 </td>
-                                <td class="material-tags-cell">
-                                    {% if material.tags %}
-                                        <div class="tags-container">
-                                            {% for tag in material.tags %}
-                                                <span class="tag" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
-                                            {% endfor %}
-                                        </div>
+                                <td class="material-category-cell">
+                                    {% if material.category %}
+                                        <span class="category-badge" style="background: linear-gradient(135deg, {{ material.category.color }}33 0%, {{ material.category.color }}22 100%); color: {{ material.category.color }}; border-color: {{ material.category.color }}66;">{{ material.category.name }}</span>
                                     {% else %}
-                                        <em>No tags</em>
+                                        <em>None</em>
                                     {% endif %}
                                 </td>
                                 <td class="material-created-cell">
@@ -90,7 +87,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="material-actions-cell">
-                                    <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-tags='{{ material.tags|map(attribute="id")|list|tojson }}'>Edit</button>
+                                    <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-category-id="{{ material.category_id or '' }}">Edit</button>
                                     <button class="action-btn delete-btn" title="Delete" data-material-id="{{ material.id }}">Delete</button>
                                 </td>
                             </tr>
@@ -111,7 +108,7 @@
             <span class="close">&times;</span>
             <h2>Edit Material</h2>
             
-            <form id="editMaterialForm" action="/api/materials" method="PUT">
+            <form id="editMaterialForm">
                 <input type="hidden" id="editMaterialId">
                 <div>
                     <label for="edit_material_name">Material Name</label>
@@ -132,6 +129,22 @@
                 <div>
                     <label for="edit_material_specification_notes">Specifications</label>
                     <textarea id="edit_material_specification_notes" name="specification_notes"></textarea>
+                </div>
+                <div>
+                    <label for="edit_material_category">Category</label>
+                    <select id="edit_material_category" name="category_id" class="material-select">
+                        <option value="">-- Select a category --</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category.id == material.category_id %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                        <option value="__new__">+ Create New Category</option>
+                    </select>
+                </div>
+                <div id="edit_new_category_container" style="display: none;">
+                    <label for="edit_new_category_name">New Category Name</label>
+                    <input type="text" id="edit_new_category_name" placeholder="Enter category name">
+                    <button type="button" id="edit_create_category_btn" class="action-btn" style="margin-top: 8px;">Create & Select</button>
+                    <button type="button" id="edit_cancel_new_category_btn" class="action-btn cancel-btn" style="margin-top: 8px;">Cancel</button>
                 </div>
                 
 

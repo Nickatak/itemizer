@@ -10,5 +10,6 @@ from . import tasks
 from . import materials
 from . import contacts
 from . import users
+from . import categories
 
 # This file serves as the central registration point for all API routes
