@@ -1,10 +1,66 @@
 // Add Material Modal Functions (Add/Search/Create Materials)
 
+async function reloadAvailableMaterials() {
+    // Fetch and reload available materials in the modal's search tab
+    const projectId = new URLSearchParams(window.location.search).get('id') || 
+                      window.location.pathname.split('/').pop();
+    
+    try {
+        const response = await fetch(`/api/projects/${projectId}/available-materials`);
+        const result = await response.json();
+        
+        if (!result.success) {
+            console.error('Error loading available materials:', result.error);
+            return;
+        }
+        
+        const materialsList = document.getElementById('materialsList');
+        if (!materialsList) {
+            return;
+        }
+        
+        const materials = result.data;
+        
+        if (materials.length === 0) {
+            materialsList.innerHTML = '<p class="no-materials">No materials available to add.</p>';
+            return;
+        }
+        
+        // Rebuild the materials list HTML
+        let html = '';
+        materials.forEach(material => {
+            html += `
+                <div class="material-item" data-name="${material.name.toLowerCase()}" data-description="${material.description ? material.description.toLowerCase() : ''}" data-material-id="${material.id}">
+                    <div>
+                        <div class="material-item-name">${material.name}</div>
+                        <div class="material-item-description">
+                            ${material.description ? material.description : 'No description'}
+                        </div>
+                    </div>
+                    <button type="button" class="add-material-btn" data-material-id="${material.id}" data-project-id="${projectId}">Add</button>
+                </div>
+            `;
+        });
+        
+        materialsList.innerHTML = html;
+        
+        // Rebind event listeners for the new buttons
+        const addMaterialButtons = materialsList.querySelectorAll('.add-material-btn');
+        addMaterialButtons.forEach(button => {
+            button.addEventListener('click', handleAddExistingMaterial);
+        });
+    } catch (error) {
+        console.error('Error reloading available materials:', error);
+    }
+}
+
 function openMaterialModal() {
     const modal = document.getElementById('materialModal');
     if (modal) {
         modal.style.display = 'block';
         resetMaterialModal();
+        // Fetch and display available materials dynamically
+        reloadAvailableMaterials();
     }
 }
 
@@ -125,6 +181,14 @@ function bindMaterialModalListeners() {
         }
     }
     
+    // Bind search tab click to fetch available materials
+    const searchTab = document.getElementById('searchTab');
+    if (searchTab) {
+        searchTab.addEventListener('click', function() {
+            reloadAvailableMaterials();
+        });
+    }
+    
     // Bind material search functionality
     const searchInput = document.getElementById('materialSearch');
     if (searchInput) {
@@ -215,4 +279,123 @@ function bindMaterialModalListeners() {
             document.getElementById('new_category_name').value = '';
         });
     }
+    
+    // Handle create material form submission
+    const createMaterialForm = document.getElementById('createMaterialForm');
+    if (createMaterialForm) {
+        createMaterialForm.addEventListener('submit', handleCreateMaterialSubmit);
+    }
+    
+    // Handle add existing material buttons (from search tab)
+    if (modal) {
+        const addMaterialButtons = modal.querySelectorAll('.add-material-btn[data-material-id]');
+        addMaterialButtons.forEach(button => {
+            button.addEventListener('click', handleAddExistingMaterial);
+        });
+    }
+}
+
+function handleCreateMaterialSubmit(event) {
+    event.preventDefault();
+    
+    const projectId = new URLSearchParams(window.location.search).get('id') || 
+                      window.location.pathname.split('/').pop();
+    
+    const materialData = {
+        name: document.getElementById('material_name').value,
+        description: document.getElementById('material_description').value || null,
+        price: parseFloat(document.getElementById('material_price').value) || null,
+        link: document.getElementById('material_link').value || null,
+        specification_notes: document.getElementById('material_specification_notes').value || null,
+        category_id: document.getElementById('material_category').value || null
+    };
+    
+    // Remove null category_id if empty
+    if (!materialData.category_id || materialData.category_id === '') {
+        delete materialData.category_id;
+    }
+    
+    // Create the material via API
+    fetch('/api/materials', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(materialData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const materialId = data.id;
+            
+            // Now add the material to the project via API
+            return fetch(`/api/projects/${projectId}/add-material/${materialId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        } else {
+            throw new Error(data.error || 'Failed to create material');
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeMaterialModal();
+            // Reload materials display
+            if (window.loadMaterials) {
+                loadMaterials();
+            }
+        } else {
+            throw new Error(data.error || 'Failed to add material to project');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
+}
+
+function handleAddExistingMaterial(event) {
+    event.preventDefault();
+    
+    const button = event.currentTarget;
+    const materialId = button.getAttribute('data-material-id');
+    const projectId = button.getAttribute('data-project-id');
+    
+    if (!materialId || !projectId) {
+        console.error('Missing material or project ID');
+        alert('Error: Missing material or project ID');
+        return;
+    }
+    
+    // Add the material to the project via API
+    fetch(`/api/projects/${projectId}/add-material/${materialId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the material item from the search tab display
+            const materialItem = button.closest('.material-item');
+            if (materialItem) {
+                materialItem.remove();
+            }
+            
+            // Reload materials display on project page
+            if (window.loadMaterials) {
+                loadMaterials();
+            }
+        } else {
+            throw new Error(data.error || 'Failed to add material to project');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
 }

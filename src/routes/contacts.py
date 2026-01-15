@@ -27,23 +27,6 @@ def create_contact_route():
         create_contact(name, email, phone, notes, is_store, created_by_id=user_id)
     return redirect(url_for('contacts.contacts'))
 
-@contacts_bp.route('/api/contacts/<int:contact_id>', methods=['PUT'])
-@login_required
-def api_update_contact(contact_id):
-    data = request.get_json()
-    
-    name = data.get('name')
-    email = data.get('email')
-    phone = data.get('phone')
-    website = data.get('website')
-    notes = data.get('notes')
-    is_store = data.get('is_store', False)
-    
-    if name:
-        update_contact(contact_id, name, email, phone, None, notes, is_store)
-        return jsonify({'success': True})
-    return jsonify({'success': False, 'error': 'Name is required'})
-
 @contacts_bp.route('/contact/<int:contact_id>/delete', methods=['POST'])
 @login_required
 def delete_contact_route(contact_id):

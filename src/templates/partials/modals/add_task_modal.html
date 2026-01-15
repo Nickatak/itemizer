@@ -1,0 +1,57 @@
+<!-- Add Task Modal -->
+<div id="addTaskModal">
+    <div>
+        <span class="close">&times;</span>
+        <h2>Add New Task</h2>
+        
+        <!-- Create Task Form -->
+        <form id="createTaskForm">
+            <input type="hidden" name="project_id" id="task_project_id" value="">
+            <div>
+                <label for="task_name">Task Name</label>
+                <input type="text" id="task_name" name="name" required>
+            </div>
+            <div>
+                <label for="task_description">Description</label>
+                <textarea id="task_description" name="description"></textarea>
+            </div>
+            <div>
+                <label for="task_start_date">Start Date</label>
+                <input type="date" id="task_start_date" name="start_date">
+            </div>
+            <div>
+                <label for="task_end_date">End Date</label>
+                <input type="date" id="task_end_date" name="end_date">
+            </div>
+            <div>
+                <label>Difficulty</label>
+                <input type="hidden" id="task_difficulty" name="difficulty" value="">
+                <div class="difficulty-grid">
+                    <button type="button" class="difficulty-btn" data-difficulty="Easy" onclick="selectDifficulty('Easy')">Easy</button>
+                    <button type="button" class="difficulty-btn" data-difficulty="Medium" onclick="selectDifficulty('Medium')">Medium</button>
+                    <button type="button" class="difficulty-btn" data-difficulty="Hard" onclick="selectDifficulty('Hard')">Hard</button>
+                    <button type="button" class="difficulty-btn" data-difficulty="Very Hard" onclick="selectDifficulty('Very Hard')">Very Hard</button>
+                </div>
+            </div>
+            <div>
+                <label for="task_completion_percentage">Completion Percentage (%)</label>
+                <select id="task_completion_percentage" name="completion_percentage">
+                    <option value="0">0%</option>
+                    <option value="10">10%</option>
+                    <option value="25">25%</option>
+                    <option value="50">50%</option>
+                    <option value="75">75%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                </select>
+            </div>
+            <div>
+                <label class="task-checkbox-label">
+                    <input type="checkbox" id="task_is_completed" name="is_completed">
+                    Mark as completed
+                </label>
+            </div>
+            <button type="submit">Create Task</button>
+        </form>
+    </div>
+</div>

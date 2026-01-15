@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.name }} - Project Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/project_detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/add_task_modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_task_modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/add_material_modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modals/edit_material_modal.css') }}">
+    <script src="{{ url_for('static', filename='js/modals/add_task_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/edit_task_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/add_material_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modals/edit_material_modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/project_details/project_materials.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/project_details/project_tasks.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-flex-container">
+                <div></div>
+                <a href="/projects" class="back-arrow" title="Back to Projects">✕</a>
+            </div>
+            <h1 class="project-title">{{ project.name }}</h1>
+            <div class="project-id">Project ID: {{ project.id }}</div>
+        </div>
+
+        <div class="project-details">
+            <div class="detail-section">
+                <div class="detail-label">
+                    Name
+                    <button id="editNameBtn" class="edit-description-icon-btn" title="Edit name">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="detail-value">
+                    <div id="nameView">
+                        <div class="name-text">{{ project.name }}</div>
+                    </div>
+                    <div id="nameEdit" style="display: none;">
+                        <input type="text" id="nameInput" class="editable-input" value="{{ project.name }}">
+                        <div class="detail-actions">
+                            <button id="saveNameBtn" class="action-btn save-btn">Save</button>
+                            <button id="cancelNameBtn" class="action-btn cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section description-section">
+                <div class="detail-label">
+                    Description
+                    <button id="editDescriptionBtn" class="edit-description-icon-btn" title="Edit description">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="detail-value">
+                    <div id="descriptionView">
+                        {% if project.description %}
+                            <div class="description-text">{{ project.description }}</div>
+                        {% else %}
+                            <div class="no-description">No description provided.</div>
+                        {% endif %}
+                    </div>
+                    <div id="descriptionEdit" style="display: none;">
+                        <textarea id="descriptionTextarea" class="description-textarea">{{ project.description or '' }}</textarea>
+                        <div class="description-actions">
+                            <button id="saveDescriptionBtn" class="action-btn save-btn">Save</button>
+                            <button id="cancelDescriptionBtn" class="action-btn cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-label">
+                    Start Date
+                    <button id="editStartDateBtn" class="edit-description-icon-btn" title="Edit start date">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="detail-value">
+                    <div id="startDateView">
+                        <div class="date-text">
+                            {% if project.start_date %}
+                                {{ project.start_date.strftime('%b %d %Y') }}
+                            {% else %}
+                                <em>Start Date Undetermined</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div id="startDateEdit" style="display: none;">
+                        <input type="date" id="startDateInput" class="editable-input" value="{{ project.start_date.strftime('%Y-%m-%d') if project.start_date else '' }}">
+                        <div class="detail-actions">
+                            <button id="saveStartDateBtn" class="action-btn save-btn">Save</button>
+                            <button id="cancelStartDateBtn" class="action-btn cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  
+
+            <div class="detail-section">
+                <div class="detail-label">
+                    End Date
+                    <button id="editEndDateBtn" class="edit-description-icon-btn" title="Edit end date">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="detail-value">
+                    <div id="endDateView">
+                        <div class="date-text">
+                            {% if project.end_date %}
+                                {{ project.end_date.strftime('%b %d %Y') }}
+                            {% else %}
+                                <em>End Date Undetermined</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div id="endDateEdit" style="display: none;">
+                        <input type="date" id="endDateInput" class="editable-input" value="{{ project.end_date.strftime('%Y-%m-%d') if project.end_date else '' }}">
+                        <div class="detail-actions">
+                            <button id="saveEndDateBtn" class="action-btn save-btn">Save</button>
+                            <button id="cancelEndDateBtn" class="action-btn cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-label">
+                    Status
+                    <button id="editStatusBtn" class="edit-description-icon-btn" title="Edit status">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="detail-value">
+                    <div id="statusView">
+                        {% if project.is_complete %}
+                            <span class="status-badge completed">✓ Completed</span>
+                        {% else %}
+                            <span class="status-badge active">In Progress</span>
+                        {% endif %}
+                    </div>
+                    <div id="statusEdit" style="display: none;">
+                        <label class="status-checkbox-label">
+                            <input type="checkbox" id="statusCheckbox" {% if project.is_complete %}checked{% endif %}>
+                            Mark as completed
+                        </label>
+                        <div class="detail-actions">
+                            <button id="saveStatusBtn" class="action-btn save-btn">Save</button>
+                            <button id="cancelStatusBtn" class="action-btn cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% include 'partials/project_details/materials_display.html' %}
+
+            {% include 'partials/project_details/tasks_display.html' %}
+        </div>
+    </div>
+
+    {% include 'partials/modals/add_task_modal.html' %}
+    {% include 'partials/modals/edit_task_modal.html' %}
+    {% include 'partials/modals/add_material_modal.html' %}
+    {% include 'partials/modals/edit_material_modal.html' %}
+
+</body>
+</html>

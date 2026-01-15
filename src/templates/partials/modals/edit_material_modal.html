@@ -1,0 +1,50 @@
+<!-- Edit Material Modal -->
+<div id="editMaterialModal">
+    <div>
+        <span class="close">&times;</span>
+        <h2>Edit Material</h2>
+
+        <form id="editMaterialForm">
+            <input type="hidden" id="editMaterialId" name="material_id">
+            <div>
+                <label for="edit_material_name">Material Name</label>
+                <input type="text" id="edit_material_name" name="name" required>
+            </div>
+            <div>
+                <label for="edit_material_description">Description</label>
+                <textarea id="edit_material_description" name="description"></textarea>
+            </div>
+            <div>
+                <label for="edit_material_price">Price ($)</label>
+                <input type="number" id="edit_material_price" name="price" step="0.01" min="0">
+            </div>
+            <div>
+                <label for="edit_material_link">Link/URL</label>
+                <input type="url" id="edit_material_link" name="link" placeholder="https://example.com">
+            </div>
+            <div>
+                <label for="edit_material_specification_notes">Specification Notes</label>
+                <textarea id="edit_material_specification_notes" name="specification_notes"></textarea>
+            </div>
+            <div>
+                <label for="edit_material_category">Category</label>
+                <select id="edit_material_category" name="category_id" class="material-select">
+                    <option value="">-- Select a category --</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                    <option value="__new__">+ Create New Category</option>
+                </select>
+            </div>
+            <div id="edit_new_category_container" style="display: none;">
+                <label for="edit_new_category_name">New Category Name</label>
+                <input type="text" id="edit_new_category_name" placeholder="Enter category name">
+                <button type="button" id="edit_create_category_btn" class="action-btn" style="margin-top: 8px;">Create & Select</button>
+                <button type="button" id="edit_cancel_new_category_btn" class="action-btn cancel-btn" style="margin-top: 8px;">Cancel</button>
+            </div>
+            <div class="material-button-group">
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>

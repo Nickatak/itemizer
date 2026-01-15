@@ -7,7 +7,7 @@ class Project(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     start_date = db.Column(db.DateTime)
-    end_date = db.Column(db.DateTime, nullable=True)
+    end_date = db.Column(db.DateTime)
     is_complete = db.Column(db.Boolean, default=False)
 
     # Many-to-many relationship with materials through association object
@@ -57,12 +57,8 @@ def get_all_projects(sort_by=None, filter_completed=None, created_by_id=None):
 def get_project_by_id(project_id):
     return Project.query.get(project_id)
 
-def create_project(name, description, start_date=None, end_date=None, created_by_id=None):
-    project = Project(name=name, description=description, created_by_id=created_by_id)
-    if start_date:
-        project.start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    if end_date:
-        project.end_date = datetime.strptime(end_date, '%Y-%m-%d')
+def create_project(name, description, created_by_id=None, start_date=None, end_date=None):
+    project = Project(name=name, description=description, start_date=start_date, end_date=end_date, created_by_id=created_by_id)
     db.session.add(project)
     db.session.commit()
     return project

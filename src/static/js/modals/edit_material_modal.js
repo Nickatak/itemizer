@@ -33,7 +33,7 @@ function submitEditMaterialForm() {
     const categoryId = document.getElementById('edit_material_category').value;
     
     // Send update request
-    fetch(`/api/materials/sss${materialId}`, {
+    fetch(`/api/materials/${materialId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

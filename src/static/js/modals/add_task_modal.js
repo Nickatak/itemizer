@@ -92,4 +92,87 @@ function bindAddTaskModalListeners() {
     if (toggleCompletedCheckbox) {
         toggleCompletedCheckbox.addEventListener('change', toggleCompletedTasks);
     }
+    
+    // Handle create task form submission
+    const createTaskForm = document.getElementById('createTaskForm');
+    if (createTaskForm) {
+        createTaskForm.removeEventListener('submit', handleCreateTaskSubmit);
+        createTaskForm.addEventListener('submit', handleCreateTaskSubmit);
+    }
+}
+
+/**
+ * Handle create task form submission
+ */
+function handleCreateTaskSubmit(event) {
+    event.preventDefault();
+    
+    const projectId = new URLSearchParams(window.location.search).get('id') || 
+                      window.location.pathname.split('/').pop();
+    
+    const taskData = {
+        name: document.getElementById('task_name').value,
+        description: document.getElementById('task_description').value || null,
+        project_id: parseInt(projectId),
+        is_completed: document.getElementById('task_is_completed').checked,
+        start_date: document.getElementById('task_start_date').value || null,
+        end_date: document.getElementById('task_end_date').value || null,
+        difficulty: document.getElementById('task_difficulty').value || null,
+        completion_percentage: parseInt(document.getElementById('task_completion_percentage').value) || 0
+    };
+    
+    // Remove null values
+    if (!taskData.description) delete taskData.description;
+    if (!taskData.start_date) delete taskData.start_date;
+    if (!taskData.end_date) delete taskData.end_date;
+    if (!taskData.difficulty) delete taskData.difficulty;
+    
+    // Create the task via API
+    fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeAddTaskModal();
+            // Reset form
+            document.getElementById('createTaskForm').reset();
+            document.getElementById('task_difficulty').value = '';
+            // Add new task to the front of the list without reloading
+            try {
+                // Always add new task to front if we have the data
+                if (data.data) {
+                    if (typeof addTaskToFront === 'function') {
+                        addTaskToFront(data.data);
+                    } else {
+                        console.warn('addTaskToFront function not available, reloading tasks');
+                        if (typeof loadTasks === 'function') {
+                            loadTasks();
+                        }
+                    }
+                } else {
+                    console.warn('No task data in response, reloading tasks');
+                    if (typeof loadTasks === 'function') {
+                        loadTasks();
+                    }
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+                // Fallback to reload on error
+                if (typeof loadTasks === 'function') {
+                    loadTasks();
+                }
+            }
+        } else {
+            throw new Error(data.error || 'Failed to create task');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
 }

@@ -764,9 +764,7 @@ body {
 
 /* Task actions container */
 .task-actions-inline {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
+    display: none;
 }
 
 /* Edit task button inline styles */
@@ -785,6 +783,77 @@ body {
 .edit-task-btn-inline:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+}
+
+/* Delete task button inline styles */
+.delete-task-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    opacity: 0.8;
+    z-index: 10;
+}
+
+.delete-task-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 51, 51, 0.4);
+    opacity: 1;
+}
+
+.delete-task-btn:active {
+    transform: translateY(0px);
+}
+
+.delete-task-btn.confirm-state {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    width: auto;
+    padding: 8px 8px;
+}
+
+.delete-task-btn.confirm-state:hover {
+    background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+    transform: translateY(-2px);
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.confirm-buttons button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.confirm-icon:hover {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+.cancel-icon:hover {
+    background: rgba(244, 67, 54, 0.3);
 }
 
 /* Add Task Modal inline styles */
@@ -939,7 +1008,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 16px;
-    cursor: grab;
+    cursor: pointer;
     user-select: none;
     transition: all 0.3s ease;
     position: relative;
@@ -1045,9 +1114,38 @@ body {
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.85em;
-    background: rgba(23, 162, 184, 0.2);
-    color: #17a2b8;
-    border: 1px solid rgba(23, 162, 184, 0.4);
+    border: 1px solid;
+    font-weight: 500;
+}
+
+.task-completion.completion-very-low {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.4);
+}
+
+.task-completion.completion-low {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border-color: rgba(255, 193, 7, 0.4);
+}
+
+.task-completion.completion-medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+.task-completion.completion-high {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.task-completion.completion-very-high {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+    border-color: rgba(0, 255, 136, 0.4);
 }
 
 .task-status {
@@ -1169,4 +1267,72 @@ body {
 
 .tasks-header:hover .drag-hint {
     color: #00ff88;
+}
+
+/* Materials loading and error states */
+.materials-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+}
+
+.materials-loading::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-left: 4px;
+    background: #888;
+    border-radius: 50%;
+    animation: dot-animation 1.5s infinite;
+}
+
+@keyframes dot-animation {
+    0%, 20% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.materials-error {
+    text-align: center;
+    padding: 30px 20px;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* Tasks loading and error states */
+.tasks-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+}
+
+.tasks-loading::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-left: 4px;
+    background: #888;
+    border-radius: 50%;
+    animation: dot-animation 1.5s infinite;
+}
+
+.tasks-error {
+    text-align: center;
+    padding: 30px 20px;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
 }

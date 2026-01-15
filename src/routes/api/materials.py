@@ -1,10 +1,11 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 from ..auth import login_required
 from ...models.material import (
     create_material, get_material_by_id, update_material, delete_material, get_all_materials
 )
 from ...models import db
 from . import api_bp
+from .api_interface import serialize_material, serialize_material_summary, parse_material_data
 
 
 @api_bp.route('/materials', methods=['POST'])
@@ -14,16 +15,11 @@ def api_create_material():
     data = request.get_json()
     
     try:
-        material = create_material(
-            name=data.get('name'),
-            description=data.get('description'),
-            price=data.get('price'),
-            link=data.get('link'),
-            specification_notes=data.get('specification_notes'),
-            created_by_id=data.get('created_by_id')
-        )
+        material_data = parse_material_data(data)
+        material_data['created_by_id'] = session.get('user_id')
+        material = create_material(**material_data)
         db.session.commit()
-        return jsonify({'success': True, 'id': material.id}), 201
+        return jsonify({'success': True, 'id': material.id, 'data': serialize_material(material)}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -39,16 +35,7 @@ def api_get_material(material_id):
     
     return jsonify({
         'success': True,
-        'data': {
-            'id': material.id,
-            'name': material.name,
-            'description': material.description,
-            'price': float(material.price) if material.price else None,
-            'link': material.link,
-            'specification_notes': material.specification_notes,
-            'created_at': material.created_at.isoformat() if material.created_at else None,
-            'updated_at': material.updated_at.isoformat() if material.updated_at else None
-        }
+        'data': serialize_material(material)
     }), 200
 
 
@@ -59,16 +46,7 @@ def api_list_materials():
     materials = get_all_materials()
     return jsonify({
         'success': True,
-        'data': [
-            {
-                'id': material.id,
-                'name': material.name,
-                'description': material.description,
-                'price': float(material.price) if material.price else None,
-                'link': material.link
-            }
-            for material in materials
-        ]
+        'data': [serialize_material_summary(material) for material in materials]
     }), 200
 
 
@@ -83,15 +61,10 @@ def api_update_material(material_id):
         return jsonify({'success': False, 'error': 'Material not found'}), 404
     
     try:
-        update_material(
-            material_id=material_id,
-            name=data.get('name'),
-            description=data.get('description'),
-            price=data.get('price'),
-            link=data.get('link'),
-            specification_notes=data.get('specification_notes'),
-            category_id=data.get('category_id')
-        )
+        material_data = parse_material_data(data)
+        # Remove None values to only update provided fields
+        material_data = {k: v for k, v in material_data.items() if v is not None or k in data}
+        update_material(material_id=material_id, **material_data)
         db.session.commit()
         return jsonify({'success': True}), 200
     except Exception as e:

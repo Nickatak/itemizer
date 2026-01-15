@@ -34,24 +34,23 @@
     </nav>
 
     <div class="container">
-
         <div class="controls-area">
             <div class="left-controls">
                 <div class="sort-controls">
                     <label for="sort-dropdown">Sort by:</label>
                     <select id="sort-dropdown" class="sort-dropdown">
-                        <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Created (Newest)</option>
-                        <option value="updated_at" {% if current_sort == 'updated_at' %}selected{% endif %}>Updated (Newest)</option>
-                        <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
-                        <option value="start_date" {% if current_sort == 'start_date' %}selected{% endif %}>Start Date</option>
+                        <option value="created_at">Created (Newest)</option>
+                        <option value="updated_at">Updated (Newest)</option>
+                        <option value="title">Title (A-Z)</option>
+                        <option value="start_date">Start Date</option>
                     </select>
                 </div>
                 
                 <div class="filter-controls">
                     <label for="filter-toggle" class="toggle-label">
-                        <input type="checkbox" id="filter-toggle" class="toggle-checkbox" {% if current_filter == 'active' %}checked{% endif %}>
+                        <input type="checkbox" id="filter-toggle" class="toggle-checkbox">
                         <span class="toggle-slider"></span>
-                        <span class="toggle-text">Hide Completed</span>
+                        <span class="toggle-text">Show Completed</span>
                     </label>
                 </div>
             </div>
@@ -60,64 +59,11 @@
         </div>
 
         <div id="projects-display" class="projects-grid">
-            {% if projects %}
-                {% for project in projects %}
-                    <a href="/project/{{ project.id }}" class="project-card" data-proj-id="{{ project.id }}">
-                        <div class="project-card-container">
-                            <div>
-                                <div class="project-title">{{ project.name }}</div>
-                                {% if project.is_complete %}<span class="status-badge completed">✓ Completed</span>{% else %}<span class="status-badge active">In Progress</span>{% endif %}
-
-                                <div class="project-description">{{ project.description or 'No description provided.' }}</div>
-
-                                <div class="project-info">
-                                    <div>Start: {% if project.start_date %}{{ project.start_date.strftime('%b %d %Y') }}{% else %}TBD{% endif %}</div>
-                                    {% if project.end_date %}
-                                    <div>End: {{ project.end_date.strftime('%b %d %Y') }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="project-meta">
-                                Created: {{ project.created_at.strftime('%b %d %Y at %-I:%M %p') }}<br>
-                                Updated: {{ project.updated_at.strftime('%b %d %Y at %-I:%M %p') }}<br>
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
-            {% else %}
-                <div class="no-projects">
-                    <p>No projects yet. Create your first project to get started!</p>
-                </div>
-            {% endif %}
+            <!-- Projects loaded via AJAX -->
         </div>
     </div>
 
-    <!-- Project Creation Modal -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal" class="close">&times;</span>
-            <h2>Create New Project</h2>
-            <form action="/projects" method="POST">
-                <div class="form-group">
-                    <label for="name">Project Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Enter project name">
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" placeholder="Enter project description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="start_date">Start Date</label>
-                    <input type="date" id="start_date" name="start_date">
-                </div>
-                <div class="form-group">
-                    <label for="end_date">End Date</label>
-                    <input type="date" id="end_date" name="end_date">
-                </div>
-                <button type="submit" class="submit-btn">Create Project</button>
-            </form>
-        </div>
-    </div>
+    <!-- Modals -->
+    {% include 'partials/project_creation_modal.html' %}
 </body>
 </html>

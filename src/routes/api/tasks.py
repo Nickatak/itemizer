@@ -1,11 +1,11 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 from ..auth import login_required
 from ...models.task import (
     create_task, get_task_by_id, update_task, delete_task, get_all_tasks, reorder_tasks
 )
 from ...models import db
-from datetime import datetime
 from . import api_bp
+from .api_interface import serialize_task, serialize_task_summary, serialize_task_for_project, parse_task_data
 
 
 @api_bp.route('/tasks', methods=['POST'])
@@ -15,19 +15,11 @@ def api_create_task():
     data = request.get_json()
     
     try:
-        task = create_task(
-            name=data.get('name'),
-            description=data.get('description'),
-            project_id=data.get('project_id'),
-            is_completed=data.get('is_completed', False),
-            start_date=datetime.fromisoformat(data['start_date']) if data.get('start_date') else None,
-            end_date=datetime.fromisoformat(data['end_date']) if data.get('end_date') else None,
-            difficulty=data.get('difficulty'),
-            completion_percentage=data.get('completion_percentage', 0),
-            created_by_id=data.get('created_by_id')
-        )
+        task_data = parse_task_data(data)
+        task_data['created_by_id'] = session.get('user_id')
+        task = create_task(**task_data)
         db.session.commit()
-        return jsonify({'success': True, 'id': task.id}), 201
+        return jsonify({'success': True, 'id': task.id, 'data': serialize_task_for_project(task)}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -43,19 +35,7 @@ def api_get_task(task_id):
     
     return jsonify({
         'success': True,
-        'data': {
-            'id': task.id,
-            'name': task.name,
-            'description': task.description,
-            'project_id': task.project_id,
-            'is_completed': task.is_completed,
-            'start_date': task.start_date.isoformat() if task.start_date else None,
-            'end_date': task.end_date.isoformat() if task.end_date else None,
-            'difficulty': task.difficulty,
-            'completion_percentage': task.completion_percentage,
-            'created_at': task.created_at.isoformat() if task.created_at else None,
-            'updated_at': task.updated_at.isoformat() if task.updated_at else None
-        }
+        'data': serialize_task(task)
     }), 200
 
 
@@ -66,18 +46,7 @@ def api_list_tasks():
     tasks = get_all_tasks()
     return jsonify({
         'success': True,
-        'data': [
-            {
-                'id': task.id,
-                'name': task.name,
-                'description': task.description,
-                'project_id': task.project_id,
-                'is_completed': task.is_completed,
-                'difficulty': task.difficulty,
-                'completion_percentage': task.completion_percentage
-            }
-            for task in tasks
-        ]
+        'data': [serialize_task_summary(task) for task in tasks]
     }), 200
 
 
@@ -92,16 +61,10 @@ def api_update_task(task_id):
         return jsonify({'success': False, 'error': 'Task not found'}), 404
     
     try:
-        update_task(
-            task_id=task_id,
-            name=data.get('name'),
-            description=data.get('description'),
-            is_completed=data.get('is_completed'),
-            start_date=datetime.fromisoformat(data['start_date']) if data.get('start_date') else None,
-            end_date=datetime.fromisoformat(data['end_date']) if data.get('end_date') else None,
-            difficulty=data.get('difficulty'),
-            completion_percentage=data.get('completion_percentage')
-        )
+        task_data = parse_task_data(data)
+        # Remove None values to only update provided fields
+        task_data = {k: v for k, v in task_data.items() if v is not None or k in data}
+        update_task(task_id=task_id, **task_data)
         db.session.commit()
         return jsonify({'success': True}), 200
     except Exception as e:
@@ -112,14 +75,26 @@ def api_update_task(task_id):
 @api_bp.route('/tasks/<int:task_id>', methods=['DELETE'])
 @login_required
 def api_delete_task(task_id):
-    """Delete a task"""
+    """Delete a task and reorder remaining tasks"""
     task = get_task_by_id(task_id)
     
     if not task:
         return jsonify({'success': False, 'error': 'Task not found'}), 404
     
     try:
+        project_id = task.project_id
         delete_task(task_id)
+        
+        # Reorder remaining tasks in the project
+        from ...models.project import get_project_by_id
+        project = get_project_by_id(project_id)
+        if project:
+            # Get all remaining tasks sorted by order
+            remaining_tasks = sorted(project.tasks, key=lambda t: t.order)
+            # Reassign order numbers sequentially
+            for index, remaining_task in enumerate(remaining_tasks, 1):
+                remaining_task.order = index
+        
         db.session.commit()
         return jsonify({'success': True}), 200
     except Exception as e:
@@ -138,7 +113,7 @@ def api_reorder_tasks(project_id):
     
     try:
         task_orders = data.get('task_order', [])
-        reorder_tasks(project_id, task_orders)
+        reorder_tasks(task_orders)
         return jsonify({'success': True, 'message': 'Tasks reordered successfully'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

@@ -37,7 +37,13 @@ def get_task_by_id(task_id):
     return Task.query.get(task_id)
 
 def create_task(name, description, project_id, is_completed=False, start_date=None, end_date=None, difficulty=None, completion_percentage=0, created_by_id=None):
-    task = Task(name=name, description=description, project_id=project_id, is_completed=is_completed, start_date=start_date, end_date=end_date, difficulty=difficulty, completion_percentage=completion_percentage, created_by_id=created_by_id)
+    # Shift all existing tasks' order up by 1 to make room at the front
+    existing_tasks = db.session.query(Task).filter(Task.project_id == project_id).all()
+    for task in existing_tasks:
+        task.order += 1
+    
+    # Create new task with order 1 (at the front)
+    task = Task(name=name, description=description, project_id=project_id, is_completed=is_completed, start_date=start_date, end_date=end_date, difficulty=difficulty, completion_percentage=completion_percentage, created_by_id=created_by_id, order=1)
     db.session.add(task)
     db.session.commit()
     return task
@@ -69,15 +75,8 @@ def delete_task(task_id):
         db.session.commit()
         return True
     return False
-def update_task_order(task_id, new_order):
-    """Update the order of a task."""
-    task = get_task_by_id(task_id)
-    if task:
-        task.order = new_order
-        db.session.commit()
-    return task
 
-def reorder_tasks(project_id, task_orders):
+def reorder_tasks(task_orders):
     """Reorder multiple tasks in a project.
     
     Args:
@@ -87,12 +86,12 @@ def reorder_tasks(project_id, task_orders):
     Returns:
         List of updated tasks
     """
-    updated_tasks = []
+
     for item in task_orders:
         task_id = item.get('task_id')
         new_order = item.get('new_order')
         if task_id and new_order:
-            task = update_task_order(task_id, new_order)
-            if task:
-                updated_tasks.append(task)
-    return updated_tasks
+            task = get_task_by_id(task_id)
+            task.order = new_order
+
+    db.session.commit()

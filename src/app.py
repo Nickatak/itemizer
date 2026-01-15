@@ -1,7 +1,6 @@
 from flask import Flask, redirect, url_for, session
 from .models import db
 from .routes.projects import projects_bp
-from .routes.tasks import tasks_bp
 from .routes.materials import materials_bp
 from .routes.contacts import contacts_bp
 from .routes.auth import auth_bp
@@ -20,7 +19,6 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(projects_bp)
-    app.register_blueprint(tasks_bp)
     app.register_blueprint(materials_bp)
     app.register_blueprint(contacts_bp)
 

@@ -13,7 +13,7 @@ function openEditTaskModal(taskId, name, description, isCompleted, startDate, en
     document.getElementById('edit_task_id').value = taskId;
     document.getElementById('edit_task_name').value = name;
     document.getElementById('edit_task_description').value = description;
-    document.getElementById('edit_task_is_completed').checked = isCompleted;
+    document.getElementById('edit_task_is_completed').checked = isCompleted === true || isCompleted === 'true';
     document.getElementById('edit_task_start_date').value = startDate;
     document.getElementById('edit_task_end_date').value = endDate;
     document.getElementById('edit_task_difficulty').value = difficulty;
@@ -49,22 +49,6 @@ function performDelete(projectId) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `/project/${projectId}/delete`;
-    document.body.appendChild(form);
-    form.submit();
-}
-
-function showMaterialDeleteConfirmation(materialId) {
-    document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.remove('hidden');
-}
-
-function hideMaterialDeleteConfirmation(materialId) {
-    document.getElementById(`materialDeleteConfirmation-${materialId}`).classList.add('hidden');
-}
-
-function performMaterialDelete(projectId, materialId) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/project/${projectId}/remove_material/${materialId}`;
     document.body.appendChild(form);
     form.submit();
 }
@@ -112,6 +96,11 @@ function selectEditDifficulty(difficulty) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Load tasks on page load
+    if (typeof loadTasks === 'function') {
+        loadTasks();
+    }
+    
     // Bind add task modal listeners
     bindAddTaskModalListeners();
     
@@ -372,11 +361,32 @@ function submitEditTaskForm() {
     const taskId = document.getElementById('edit_task_id').value;
     const name = document.getElementById('edit_task_name').value;
     const description = document.getElementById('edit_task_description').value;
-    const isCompleted = document.getElementById('edit_task_is_completed').checked;
+    let isCompleted = document.getElementById('edit_task_is_completed').checked;
     const startDate = document.getElementById('edit_task_start_date').value;
     const endDate = document.getElementById('edit_task_end_date').value;
     const difficulty = document.getElementById('edit_task_difficulty').value;
-    const completionPercentage = document.getElementById('edit_task_completion_percentage').value;
+    let completionPercentage = parseInt(document.getElementById('edit_task_completion_percentage').value) || 0;
+    
+    // Get the current task card to check if completion status changed
+    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+    const wasCompleted = taskCard ? taskCard.getAttribute('data-completed') === 'true' : false;
+    const previousCompletionPercentage = parseInt(taskCard ? taskCard.getAttribute('data-task-completion-percentage') : 0) || 0;
+    
+    // If completion percentage is 100%, mark as completed
+    if (completionPercentage === 100) {
+        isCompleted = true;
+    }
+    // If completion percentage WAS 100% but is now lower, mark as incomplete
+    else if (previousCompletionPercentage === 100 && completionPercentage < 100) {
+        isCompleted = false;
+    }
+    // If task was completed but is now being marked as incomplete, set completion to 90%
+    else if (wasCompleted && !isCompleted) {
+        completionPercentage = 90;
+    }
+    
+    const isNowCompleted = isCompleted;
+    const completionStatusChanged = wasCompleted !== isNowCompleted;
     
     fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
@@ -390,15 +400,22 @@ function submitEditTaskForm() {
             start_date: startDate,
             end_date: endDate,
             difficulty: difficulty,
-            completion_percentage: completionPercentage ? parseInt(completionPercentage) : 0
+            completion_percentage: completionPercentage
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             closeEditTaskModal();
-            // Reload page to see updates
-            location.reload();
+            
+            // If task was just marked as completed, reload and reorder tasks
+            if (completionStatusChanged && isNowCompleted) {
+                // Reload tasks which will naturally sort completed tasks to the end
+                loadTasks();
+            } else {
+                // For other changes, just reload the page
+                location.reload();
+            }
         } else {
             alert('Error updating task: ' + (data.error || 'Unknown error'));
         }
@@ -886,69 +903,13 @@ function updateTaskOrderDisplay() {
     });
 }
 
-function saveTaskOrder() {
-    const tasks = document.querySelectorAll('.task-card');
-    const taskOrder = Array.from(tasks).map((task, index) => {
-        // Extract task ID from data attributes or from edit button
-        const editBtn = task.querySelector('.edit-task-btn-inline');
-        if (editBtn) {
-            return {
-                task_id: parseInt(editBtn.dataset.taskId),
-                new_order: index + 1
-            };
-        }
-    }).filter(item => item !== undefined);
-    
-    if (taskOrder.length === 0) {
-        console.warn('No tasks found to reorder');
-        return;
-    }
-    
-    // Get project ID from URL or data attribute
-    const projectId = window.location.pathname.split('/').pop();
-    
-    // Add visual feedback while saving
-    const tasksList = document.querySelector('.tasks-list');
-    if (tasksList) {
-        tasksList.style.opacity = '0.7';
-    }
-    
-    fetch(`/api/projects/${projectId}/reorder-tasks`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            task_order: taskOrder
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Restore visual feedback
-        if (tasksList) {
-            tasksList.style.opacity = '1';
-        }
-        
-        if (data.success) {
-            console.log('Task order saved successfully to database');
-        } else {
-            console.error('Error saving task order:', data.error);
-            alert('Error saving task order: ' + (data.error || 'Unknown error') + '\nPlease try again.');
-        }
-    })
-    .catch(error => {
-        // Restore visual feedback
-        if (tasksList) {
-            tasksList.style.opacity = '1';
-        }
-        
-        console.error('Error:', error);
-        alert('Error saving task order: ' + error.message + '\nChanges may not be persisted.');
-    });
-}
+
+
+// Load materials and tasks when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMaterials();
+    initializeTasks();
+});
+
+
 

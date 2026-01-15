@@ -1,0 +1,107 @@
+<!-- Material Selection Modal -->
+<div id="materialModal">
+    <div>
+        <span class="close">&times;</span>
+        <h2 id="materialModalTitle">Add Material to Project</h2>
+
+        <!-- Tab Navigation -->
+        <div class="material-modal-tabs">
+            <button id="searchTab" class="tab-button active" data-tab="search">Search Materials</button>
+            <button id="createTab" class="tab-button" data-tab="create">Create New Material</button>
+        </div>
+
+        <!-- Search Tab Content -->
+        <div id="searchContent" class="tab-content">
+            <div class="material-search-container">
+                <input type="text" id="materialSearch" placeholder="Search materials...">
+            </div>
+            <div id="materialsList">
+                <div class="materials-loading">Loading materials...</div>
+            </div>
+        </div>
+
+        <!-- Create Tab Content -->
+        <div id="createContent" class="tab-content">
+            <form id="createMaterialForm">
+                <div>
+                    <label for="material_name">Material Name</label>
+                    <input type="text" id="material_name" name="name" required>
+                </div>
+                <div>
+                    <label for="material_description">Description</label>
+                    <textarea id="material_description" name="description"></textarea>
+                </div>
+                <div>
+                    <label for="material_price">Price ($)</label>
+                    <input type="number" id="material_price" name="price" step="0.01" min="0">
+                </div>
+                <div>
+                    <label for="material_link">Link/URL</label>
+                    <input type="url" id="material_link" name="link" placeholder="https://example.com">
+                </div>
+                <div>
+                    <label for="material_specification_notes">Specification Notes</label>
+                    <textarea id="material_specification_notes" name="specification_notes"></textarea>
+                </div>
+                <div>
+                    <label for="material_category">Category (Optional)</label>
+                    <select id="material_category" name="category_id" class="material-select">
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category.name == 'None'%}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                        <option value="__new__">+ Create New Category</option>
+                    </select>
+                </div>
+                <div id="new_category_container" style="display: none;">
+                    <label for="new_category_name">New Category Name</label>
+                    <input type="text" id="new_category_name" placeholder="Enter category name">
+                    <button type="button" id="create_category_btn" class="material-submit-btn" style="margin-top: 8px; padding: 8px 16px;">Create & Select</button>
+                    <button type="button" id="cancel_new_category_btn" class="action-btn cancel-btn" style="margin-top: 8px; padding: 8px 16px;">Cancel</button>
+                </div>
+
+                
+                <div class="contact-section">
+                    <label class="contact-option-label">Associated Contact (Optional)</label>
+                    <div>
+                        <label class="contact-option-small-label">Choose an option:</label>
+                        <select id="contact_option" class="contact-option-select">
+                            <option value="none">None</option>
+                            <option value="select">Select Existing Contact</option>
+                            <option value="create">Create New Contact</option>
+                        </select>
+                    </div>
+                    <div id="select_contact_div">
+                        <select id="existing_contact_id" name="contact_id" class="contact-option-select">
+                            <option value="">-- Select a contact --</option>
+                            {% for contact in contacts %}
+                                <option value="{{ contact.id }}">{{ contact.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="create_contact_div">
+                        <div>
+                            <label class="contact-option-small-label">Name</label>
+                            <input type="text" id="new_contact_name" class="contact-input" name="new_contact_name" placeholder="Contact name">
+                        </div>
+                        <div>
+                            <label class="contact-option-small-label">Email</label>
+                            <input type="email" id="new_contact_email" class="contact-input" name="new_contact_email" placeholder="Email address">
+                        </div>
+                        <div>
+                            <label class="contact-option-small-label">Phone</label>
+                            <input type="tel" id="new_contact_phone" class="contact-input" name="new_contact_phone" placeholder="Phone number">
+                        </div>
+                        <div>
+                            <label class="contact-checkbox-label">
+                                <input type="checkbox" id="new_contact_is_store" name="new_contact_is_store">
+                                This is a store/supplier
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="material-submit-btn">Create & Add to Project</button>
+            </form>
+        </div>
+    </div>
+</div>
