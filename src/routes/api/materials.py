@@ -42,11 +42,12 @@ def api_get_material(material_id):
 @api_bp.route('/materials', methods=['GET'])
 @login_required
 def api_list_materials():
-    """List all materials"""
-    materials = get_all_materials()
+    """List all materials for current user"""
+    user_id = session.get('user_id')
+    materials = get_all_materials(created_by_id=user_id)
     return jsonify({
         'success': True,
-        'data': [serialize_material_summary(material) for material in materials]
+        'data': [serialize_material(material) for material in materials]
     }), 200
 
 

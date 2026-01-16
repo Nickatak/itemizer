@@ -13,13 +13,7 @@ materials_bp = Blueprint('materials', __name__)
 @materials_bp.route('/materials')
 @login_required
 def materials_dashboard():
-    user_id = session.get('user_id')
-    materials = get_all_materials(created_by_id=user_id)
-    from ..models.category import get_all_categories
-    user_categories = get_all_categories(created_by_id=user_id)
-    system_categories = get_all_categories(created_by_id=2)
-    categories = user_categories + system_categories
-    return render_template('materials.html', materials=materials, categories=categories)
+    return render_template('materials.html')
 
 @materials_bp.route('/material/<int:material_id>/delete', methods=['POST'])
 @login_required

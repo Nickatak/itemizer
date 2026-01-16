@@ -42,63 +42,7 @@
         </div>
 
         <div id="materials-display" class="materials-table-container">
-            {% if materials %}
-                <table class="materials-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Category</th>
-                            <th>Last Used</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for material in materials %}
-                            <tr class="material-row" id="material-row-{{ material.id }}">
-                                <td class="material-name-cell">{{ material.name }}</td>
-                                <td class="material-description-cell">
-                                    {% if material.description %}
-                                        {{ material.description[:60] }}{% if material.description|length > 60 %}...{% endif %}
-                                    {% else %}
-                                        <em>No description</em>
-                                    {% endif %}
-                                </td>
-                                <td class="material-price-cell">
-                                    {% if material.price %}
-                                        ${{ "%.2f"|format(material.price) }}
-                                    {% else %}
-                                        <em>N/A</em>
-                                    {% endif %}
-                                </td>
-                                <td class="material-category-cell">
-                                    {% if material.category %}
-                                        <span class="category-badge" style="background: linear-gradient(135deg, {{ material.category.color }}33 0%, {{ material.category.color }}22 100%); color: {{ material.category.color }}; border-color: {{ material.category.color }}66;">{{ material.category.name }}</span>
-                                    {% else %}
-                                        <em>None</em>
-                                    {% endif %}
-                                </td>
-                                <td class="material-created-cell">
-                                    {% if material.last_used %}
-                                        {{ material.last_used.strftime('%b %d %Y') }}
-                                    {% else %}
-                                        <em>Never</em>
-                                    {% endif %}
-                                </td>
-                                <td class="material-actions-cell">
-                                    <button class="action-btn edit-btn" title="Edit" data-material-id="{{ material.id }}" data-material-name="{{ material.name }}" data-material-description="{{ material.description or '' }}" data-material-price="{{ material.price or '' }}" data-material-link="{{ material.link or '' }}" data-material-specs="{{ material.specification_notes or '' }}" data-material-category-id="{{ material.category_id or '' }}">Edit</button>
-                                    <button class="action-btn delete-btn" title="Delete" data-material-id="{{ material.id }}">Delete</button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div class="no-materials">
-                    <p>No materials yet. Add materials to your projects to see them here.</p>
-                </div>
-            {% endif %}
+            <div id="loadingSpinner" class="loading-spinner">Loading materials...</div>
         </div>
     </div>
 
@@ -134,10 +78,6 @@
                     <label for="edit_material_category">Category</label>
                     <select id="edit_material_category" name="category_id" class="material-select">
                         <option value="">-- Select a category --</option>
-                        {% for category in categories %}
-                            <option value="{{ category.id }}" {% if category.id == material.category_id %}selected{% endif %}>{{ category.name }}</option>
-                        {% endfor %}
-                        <option value="__new__">+ Create New Category</option>
                     </select>
                 </div>
                 <div id="edit_new_category_container" style="display: none;">

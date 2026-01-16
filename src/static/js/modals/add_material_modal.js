@@ -29,6 +29,10 @@ async function reloadAvailableMaterials() {
         // Rebuild the materials list HTML
         let html = '';
         materials.forEach(material => {
+            const categoryHtml = material.category 
+                ? `<span class="material-item-category" style="background: linear-gradient(135deg, ${material.category.color}33 0%, ${material.category.color}22 100%); color: ${material.category.color}; border-color: ${material.category.color}66;">${material.category.name}</span>`
+                : '';
+            
             html += `
                 <div class="material-item" data-name="${material.name.toLowerCase()}" data-description="${material.description ? material.description.toLowerCase() : ''}" data-material-id="${material.id}">
                     <div>
@@ -36,6 +40,7 @@ async function reloadAvailableMaterials() {
                         <div class="material-item-description">
                             ${material.description ? material.description : 'No description'}
                         </div>
+                        ${categoryHtml}
                     </div>
                     <button type="button" class="add-material-btn" data-material-id="${material.id}" data-project-id="${projectId}">Add</button>
                 </div>

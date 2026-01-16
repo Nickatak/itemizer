@@ -128,6 +128,17 @@
 .material-item-description {
     color: #b0b0b0;
     font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.material-item-category {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+    border: 1px solid;
+    line-height: 1.2;
 }
 
 .material-item form {
