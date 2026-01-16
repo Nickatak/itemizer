@@ -180,6 +180,39 @@ body {
     font-size: 0.95em;
 }
 
+/* Sortable headers */
+.materials-table th.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.materials-table th.sortable-header:hover {
+    background: rgba(0, 255, 136, 0.15);
+}
+
+.materials-table th.sortable-header::after {
+    content: ' ▼';
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 0.7em;
+    margin-left: 6px;
+    color: #00ff88;
+}
+
+.materials-table th.sortable-header.sorted::after {
+    opacity: 1;
+}
+
+.materials-table th.sortable-header.sorted.asc::after {
+    content: ' ▲';
+}
+
+.materials-table th.sortable-header.sorted.desc::after {
+    content: ' ▼';
+}
+
 .materials-table tbody tr {
     border-bottom: 1px solid rgba(0, 255, 136, 0.1);
     transition: background-color 0.3s;
@@ -296,6 +329,15 @@ body {
     box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
+.material-actions-cell .edit-btn {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+}
+
+.material-actions-cell .edit-btn:hover {
+    background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+}
+
 .material-actions-cell .confirm-delete-btn {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
     color: white;
@@ -366,144 +408,6 @@ body {
     .material-tags-cell {
         max-width: 120px;
     }
-}
-
-/* Edit Material Modal Styles */
-#editMaterialModal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    overflow-y: auto;
-}
-
-#editMaterialModal.show {
-    display: block;
-}
-
-.modal-content {
-    background: rgba(6, 20, 16, 0.95);
-    margin: 10% auto;
-    padding: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    max-width: 600px;
-    width: 90%;
-    animation: modalFadeIn 0.3s ease-out;
-    color: #e0e0e0;
-    position: relative;
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-50px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-content h2 {
-    margin-bottom: 20px;
-    color: #00ff88;
-    font-size: 1.5em;
-}
-
-.modal-content form div {
-    margin-bottom: 20px;
-}
-
-.modal-content label {
-    display: block;
-    margin-bottom: 8px;
-    color: #a0a0b0;
-    font-weight: 500;
-}
-
-.modal-content input[type="text"],
-.modal-content input[type="number"],
-.modal-content input[type="url"],
-.modal-content textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #e0e0e0;
-    font-family: inherit;
-    font-size: 1em;
-    transition: all 0.3s;
-}
-
-.modal-content input[type="text"]:focus,
-.modal-content input[type="number"]:focus,
-.modal-content input[type="url"]:focus,
-.modal-content textarea:focus {
-    outline: none;
-    border-color: #00ff88;
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
-}
-
-.modal-content textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.modal-content select,
-.material-select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #e0e0e0;
-    font-family: inherit;
-    font-size: 1em;
-    transition: all 0.3s;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e0e0e0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
-}
-
-.modal-content select:hover,
-.material-select:hover {
-    border-color: rgba(0, 255, 136, 0.3);
-    background-color: rgba(255, 255, 255, 0.08);
-}
-
-.modal-content select:focus,
-.material-select:focus {
-    outline: none;
-    border-color: #00ff88;
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
-}
-
-.modal-content select option,
-.material-select option {
-    background: #061410;
-    color: #e0e0e0;
-    padding: 10px;
-    border: none;
-    margin: 5px 0;
-}
-
-.modal-content select option:hover,
-.material-select option:hover {
-    background: #0a3d2f;
-    color: #00ff88;
-}
-
-.modal-content select option:checked,
-.material-select option:checked {
-    background: linear-gradient(#0a3d2f, #0a3d2f);
-    background-color: #0a3d2f;
-    color: #00ff88;
 }
 
 #edit_tags-list {

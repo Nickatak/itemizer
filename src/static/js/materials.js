@@ -1,5 +1,7 @@
 let allMaterials = [];
 let categoriesCache = [];
+let currentSortColumn = 'name';
+let currentSortDirection = 'asc';
 
 // Fetch all categories
 async function loadCategories() {
@@ -38,6 +40,51 @@ function populateCategorySelect() {
     select.appendChild(newOption);
 }
 
+// Sort materials by column
+function sortMaterials(column) {
+    if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortColumn = column;
+        currentSortDirection = 'asc';
+    }
+    
+    const sorted = [...allMaterials].sort((a, b) => {
+        let aVal, bVal;
+        
+        switch (column) {
+            case 'name':
+                aVal = a.name.toLowerCase();
+                bVal = b.name.toLowerCase();
+                break;
+            case 'description':
+                aVal = (a.description || '').toLowerCase();
+                bVal = (b.description || '').toLowerCase();
+                break;
+            case 'price':
+                aVal = parseFloat(a.price) || 0;
+                bVal = parseFloat(b.price) || 0;
+                break;
+            case 'category':
+                aVal = (a.category?.name || '').toLowerCase();
+                bVal = (b.category?.name || '').toLowerCase();
+                break;
+            case 'last_used':
+                aVal = a.last_used ? new Date(a.last_used).getTime() : 0;
+                bVal = b.last_used ? new Date(b.last_used).getTime() : 0;
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    renderMaterials(sorted);
+}
+
 // Fetch all materials
 async function loadMaterials() {
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -73,15 +120,22 @@ function renderMaterials(materials) {
         return;
     }
     
+    const getHeaderClass = (column) => {
+        if (currentSortColumn === column) {
+            return `sortable-header sorted ${currentSortDirection}`;
+        }
+        return 'sortable-header';
+    };
+    
     const tableHTML = `
         <table class="materials-table">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th class="${getHeaderClass('name')}" data-sort="name">Name</th>
                     <th>Description</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th>Last Used</th>
+                    <th class="${getHeaderClass('price')}" data-sort="price">Price</th>
+                    <th class="${getHeaderClass('category')}" data-sort="category">Category</th>
+                    <th class="${getHeaderClass('last_used')}" data-sort="last_used">Last Used</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -126,11 +180,21 @@ function renderMaterials(materials) {
     `;
     
     display.innerHTML = tableHTML;
+    attachSortListeners();
     attachEditListeners();
     attachDeleteListeners();
 }
 
-// Attach edit button listeners
+// Attach sort header listeners
+function attachSortListeners() {
+    const headers = document.querySelectorAll('th.sortable-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.dataset.sort;
+            sortMaterials(column);
+        });
+    });
+}
 function attachEditListeners() {
     const editBtns = document.querySelectorAll('.material-actions-cell .edit-btn');
     editBtns.forEach(btn => {
@@ -262,7 +326,7 @@ function performSearch() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     
     if (!searchTerm) {
-        renderMaterials(allMaterials);
+        sortMaterials(currentSortColumn);
         return;
     }
     
@@ -272,7 +336,41 @@ function performSearch() {
         return name.includes(searchTerm) || description.includes(searchTerm);
     });
     
-    renderMaterials(filtered);
+    // Sort the filtered results
+    const sorted = [...filtered].sort((a, b) => {
+        let aVal, bVal;
+        
+        switch (currentSortColumn) {
+            case 'name':
+                aVal = a.name.toLowerCase();
+                bVal = b.name.toLowerCase();
+                break;
+            case 'description':
+                aVal = (a.description || '').toLowerCase();
+                bVal = (b.description || '').toLowerCase();
+                break;
+            case 'price':
+                aVal = parseFloat(a.price) || 0;
+                bVal = parseFloat(b.price) || 0;
+                break;
+            case 'category':
+                aVal = (a.category?.name || '').toLowerCase();
+                bVal = (b.category?.name || '').toLowerCase();
+                break;
+            case 'last_used':
+                aVal = a.last_used ? new Date(a.last_used).getTime() : 0;
+                bVal = b.last_used ? new Date(b.last_used).getTime() : 0;
+                break;
+            default:
+                return 0;
+        }
+        
+        if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    renderMaterials(sorted);
 }
 
 // Utility: Escape HTML characters to prevent XSS

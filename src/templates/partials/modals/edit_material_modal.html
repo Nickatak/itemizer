@@ -1,6 +1,6 @@
 <!-- Edit Material Modal -->
-<div id="editMaterialModal">
-    <div>
+<div id="editMaterialModal" class="modal">
+    <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Edit Material</h2>
 
@@ -30,10 +30,6 @@
                 <label for="edit_material_category">Category</label>
                 <select id="edit_material_category" name="category_id" class="material-select">
                     <option value="">-- Select a category --</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                    {% endfor %}
-                    <option value="__new__">+ Create New Category</option>
                 </select>
             </div>
             <div id="edit_new_category_container" style="display: none;">
@@ -44,6 +40,7 @@
             </div>
             <div class="material-button-group">
                 <button type="submit">Save Changes</button>
+                <button type="button" class="cancel-edit-btn">Cancel</button>
             </div>
         </form>
     </div>
