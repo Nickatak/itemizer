@@ -198,8 +198,7 @@ def parse_project_data(data):
         'name': data.get('name'),
         'description': data.get('description'),
         'start_date': datetime.fromisoformat(data['start_date']) if data.get('start_date') else None,
-        'end_date': datetime.fromisoformat(data['end_date']) if data.get('end_date') else None,
-        'is_complete': data.get('is_complete')
+        'end_date': datetime.fromisoformat(data['end_date']) if data.get('end_date') else None
     }
 
 
