@@ -29,6 +29,15 @@ function openEditContactModal(contactId, name, email, phone, website, notes, isS
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Create contact form submission
+    const createForm = document.getElementById('createContactForm');
+    if (createForm) {
+        createForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitCreateContactForm();
+        });
+    }
+
     // Edit contact form submission
     const editForm = document.getElementById('editContactForm');
     if (editForm) {
@@ -91,6 +100,45 @@ function submitEditContactForm() {
     .catch(error => {
         console.error('Error:', error);
         alert('Error updating contact');
+    });
+}
+
+function submitCreateContactForm() {
+    const name = document.getElementById('contact_name').value;
+    const email = document.getElementById('contact_email').value;
+    const phone = document.getElementById('contact_phone').value;
+    const website = document.getElementById('contact_website').value;
+    const notes = document.getElementById('contact_notes').value;
+    const isStore = document.getElementById('contact_is_store').checked;
+    
+    fetch('/api/contacts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            phone: phone,
+            website: website,
+            notes: notes,
+            is_store: isStore
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeContactModal();
+            document.getElementById('createContactForm').reset();
+            // Reload contacts list
+            loadContactsList();
+        } else {
+            alert('Error creating contact: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error creating contact');
     });
 }
 
@@ -226,4 +274,105 @@ function searchContacts(searchTerm) {
         
         row.style.display = matches ? 'table-row' : 'none';
     });
+}
+
+async function loadContactsList() {
+    try {
+        const response = await fetch('/api/contacts');
+        const result = await response.json();
+        
+        if (!result.success) {
+            console.error('Error loading contacts');
+            return;
+        }
+        
+        const contacts = result.data;
+        const contactsList = document.querySelector('.contacts-list');
+        
+        if (!contacts || contacts.length === 0) {
+            contactsList.innerHTML = '<div class="no-contacts"><p>No contacts yet. Click "Add Contact" to create your first contact.</p></div>';
+            return;
+        }
+        
+        // Create table HTML
+        let tableHTML = `
+            <table class="contacts-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Type</th>
+                        <th>Materials</th>
+                        <th>Tasks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        contacts.forEach(contact => {
+            const emailHTML = contact.email 
+                ? `<a href="mailto:${contact.email}">${contact.email}</a>`
+                : '<span class="empty">—</span>';
+            
+            const phoneHTML = contact.phone 
+                ? `<a href="tel:${contact.phone}">${contact.phone}</a>`
+                : '<span class="empty">—</span>';
+            
+            const typeHTML = contact.is_store 
+                ? '<span class="contact-badge store-badge">Store</span>'
+                : '<span class="empty">—</span>';
+            
+            tableHTML += `
+                <tr class="contact-row">
+                    <td class="contact-name-cell">${contact.name}</td>
+                    <td class="contact-email-cell">${emailHTML}</td>
+                    <td class="contact-phone-cell">${phoneHTML}</td>
+                    <td class="contact-type-cell">${typeHTML}</td>
+                    <td class="contact-materials-cell">0</td>
+                    <td class="contact-tasks-cell">0</td>
+                    <td class="contact-actions-cell">
+                        <button type="button" class="edit-btn" data-contact-id="${contact.id}" data-contact-name="${contact.name}" data-contact-email="${contact.email || ''}" data-contact-phone="${contact.phone || ''}" data-contact-website="" data-contact-notes="" data-contact-store="${contact.is_store}">Edit</button>
+                        <form action="/contact/${contact.id}/delete" method="POST" style="display: inline;">
+                            <button type="submit" class="delete-btn" data-delete-confirm="true">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableHTML += `
+                </tbody>
+            </table>
+        `;
+        
+        contactsList.innerHTML = tableHTML;
+        
+        // Re-attach event listeners
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const contactId = this.dataset.contactId;
+                const name = this.dataset.contactName;
+                const email = this.dataset.contactEmail;
+                const phone = this.dataset.contactPhone;
+                const website = this.dataset.contactWebsite;
+                const notes = this.dataset.contactNotes;
+                const isStore = this.dataset.contactStore === 'true';
+                openEditContactModal(contactId, name, email, phone, website, notes, isStore);
+            });
+        });
+        
+        const deleteButtons = document.querySelectorAll('.delete-btn[data-delete-confirm]');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Delete this contact? This action cannot be undone.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading contacts:', error);
+    }
 }

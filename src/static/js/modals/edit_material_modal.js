@@ -51,8 +51,10 @@ function submitEditMaterialForm() {
     .then(data => {
         if (data.success) {
             closeEditMaterialModal();
-            // Reload page to see updates
-            location.reload();
+            // Dynamically reload materials list without refreshing page
+            if (window.loadMaterials) {
+                loadMaterials();
+            }
         } else {
             alert('Error updating material: ' + (data.error || 'Unknown error'));
         }

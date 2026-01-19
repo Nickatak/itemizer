@@ -383,30 +383,432 @@ body {
     color: #888888;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .container {
-        padding: 15px;
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 2.2em;
     }
 
     .materials-table-container {
-        overflow-x: auto;
-    }
-
-    .materials-table {
-        font-size: 0.85em;
+        border-radius: 8px;
     }
 
     .materials-table th,
     .materials-table td {
-        padding: 10px 8px;
+        padding: 12px 10px;
     }
 
     .material-description-cell {
-        max-width: 150px;
+        max-width: 200px;
     }
 
     .material-tags-cell {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 65px;
+    }
+
+    .navbar-container {
+        height: 60px;
+        padding: 0 12px;
+    }
+
+    .navbar-logo {
+        font-size: 1.1em;
+    }
+
+    .navbar-menu {
+        gap: 5px;
+    }
+
+    .navbar-link {
+        padding: 7px 10px;
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 12px;
+    }
+
+    .search-bar-container {
+        margin-bottom: 16px;
+    }
+
+    .search-bar {
+        padding: 11px 12px 11px 36px;
+        font-size: 0.95em;
+    }
+
+    .search-icon {
+        left: 10px;
+        font-size: 1.1em;
+    }
+
+    .header {
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+    }
+
+    .materials-table-container {
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .materials-table {
+        font-size: 0.9em;
+        min-width: 600px;
+    }
+
+    .materials-table th {
+        padding: 11px 8px;
+        font-size: 0.85em;
+    }
+
+    .materials-table td {
+        padding: 10px 8px;
+    }
+
+    .material-name-cell {
+        font-weight: 600;
+        min-width: 100px;
+    }
+
+    .material-description-cell {
         max-width: 120px;
+        font-size: 0.9em;
+    }
+
+    .material-price-cell {
+        white-space: nowrap;
+    }
+
+    .material-tags-cell {
+        max-width: 100px;
+    }
+
+    .tags-container {
+        gap: 4px;
+    }
+
+    .tag {
+        padding: 3px 8px;
+        font-size: 0.75em;
+    }
+
+    .category-badge {
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+
+    .status-badge {
+        padding: 3px 8px;
+        font-size: 0.8em;
+    }
+
+    .material-actions-cell .action-btn,
+    .material-actions-cell .edit-btn,
+    .material-actions-cell .confirm-delete-btn,
+    .material-actions-cell .cancel-delete-btn {
+        padding: 6px 10px;
+        font-size: 0.8em;
+        margin: 2px;
+    }
+
+    .no-materials {
+        padding: 30px 16px;
+    }
+
+    .no-materials p {
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .navbar-container {
+        height: 55px;
+        padding: 0 8px;
+    }
+
+    .navbar-logo {
+        font-size: 1em;
+    }
+
+    .navbar-menu {
+        gap: 2px;
+    }
+
+    .navbar-link {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    .container {
+        padding: 8px;
+    }
+
+    .search-bar-container {
+        margin-bottom: 12px;
+    }
+
+    .search-bar {
+        padding: 10px 10px 10px 32px;
+        font-size: 0.9em;
+        border-radius: 6px;
+    }
+
+    .search-icon {
+        left: 8px;
+        font-size: 1em;
+    }
+
+    .header {
+        margin-bottom: 16px;
+    }
+
+    .page-title {
+        font-size: 1.5em;
+        margin-bottom: 6px;
+    }
+
+    .materials-table-container {
+        border-radius: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .materials-table {
+        font-size: 0.85em;
+        min-width: 550px;
+    }
+
+    .materials-table thead {
+        border-bottom: 1px solid #00ff88;
+    }
+
+    .materials-table th {
+        padding: 9px 6px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    .materials-table td {
+        padding: 8px 6px;
+    }
+
+    .material-name-cell {
+        font-weight: 600;
+        min-width: 90px;
+    }
+
+    .material-description-cell {
+        max-width: 100px;
+        font-size: 0.85em;
+        white-space: nowrap;
+    }
+
+    .material-price-cell {
+        white-space: nowrap;
+        font-size: 0.85em;
+    }
+
+    .material-category-cell {
+        white-space: nowrap;
+    }
+
+    .category-badge {
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+
+    .material-tags-cell {
+        max-width: 80px;
+    }
+
+    .tags-container {
+        gap: 3px;
+    }
+
+    .tag {
+        padding: 2px 6px;
+        font-size: 0.7em;
+    }
+
+    .status-badge {
+        padding: 2px 6px;
+        font-size: 0.75em;
+    }
+
+    .material-created-cell {
+        font-size: 0.8em;
+    }
+
+    .material-actions-cell {
+        white-space: normal;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .material-actions-cell .action-btn,
+    .material-actions-cell .edit-btn,
+    .material-actions-cell .confirm-delete-btn,
+    .material-actions-cell .cancel-delete-btn {
+        padding: 6px 8px;
+        font-size: 0.75em;
+        margin: 0;
+        width: 100%;
+        min-width: 50px;
+    }
+
+    .no-materials {
+        padding: 24px 12px;
+    }
+
+    .no-materials p {
+        font-size: 0.9em;
+    }
+
+    .no-search-results {
+        padding: 16px;
+        font-size: 0.9em;
+    }
+
+    .no-search-results td {
+        padding: 16px;
+    }
+
+    /* Modal Mobile Styles */
+    #materialModal > div {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        border-radius: 10px;
+        padding: 16px !important;
+    }
+
+    #materialModal h2 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
+    }
+
+    #materialModal label {
+        font-size: 0.95em;
+        margin-bottom: 4px;
+    }
+
+    #materialModal input[type="text"],
+    #materialModal input[type="email"],
+    #materialModal input[type="url"],
+    #materialModal input[type="number"],
+    #materialModal textarea,
+    #materialModal select {
+        padding: 11px 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+    }
+
+    #materialModal textarea {
+        min-height: 100px;
+    }
+
+    #materialModal button[type="submit"],
+    #materialModal .cancel-edit-btn {
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .material-button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 12px;
+    }
+
+    .material-button-group button {
+        padding: 12px 12px;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 12px;
+    }
+
+    .form-actions button {
+        padding: 12px 12px;
+        font-size: 15px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .submit-btn,
+    .cancel-edit-btn {
+        padding: 12px 12px;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .close {
+        right: 12px;
+        top: 12px;
+        font-size: 24px;
+    }
+
+    #edit_tags-list {
+        margin-bottom: 12px;
+    }
+
+    .tag-badge {
+        padding: 5px 10px;
+        font-size: 0.85em;
+        margin-bottom: 6px;
+    }
+
+    .new-tag {
+        padding: 5px 10px;
+        font-size: 0.85em;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    .loading-spinner {
+        padding: 30px 20px;
+        font-size: 1em;
+    }
+
+    .loading-spinner::after {
+        width: 18px;
+        height: 18px;
+        margin-left: 8px;
+    }
+
+    .error-message {
+        padding: 16px;
+        border-radius: 6px;
+        font-size: 0.95em;
     }
 }
 

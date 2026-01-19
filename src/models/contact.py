@@ -33,13 +33,13 @@ def get_all_contacts(sort_by=None, created_by_id=None):
 def get_contact_by_id(contact_id):
     return Contact.query.get(contact_id)
 
-def create_contact(name, email=None, phone=None, notes=None, is_store=False, created_by_id=None):
-    contact = Contact(name=name, email=email, phone=phone, notes=notes, is_store=is_store, created_by_id=created_by_id)
+def create_contact(name, email=None, phone=None, website=None, notes=None, is_store=False, created_by_id=None):
+    contact = Contact(name=name, email=email, phone=phone, website=website, notes=notes, is_store=is_store, created_by_id=created_by_id)
     db.session.add(contact)
     db.session.commit()
     return contact
 
-def update_contact(contact_id, name=None, email=None, phone=None, address=None, notes=None, is_store=None):
+def update_contact(contact_id, name=None, email=None, phone=None, website=None, notes=None, is_store=None):
     contact = get_contact_by_id(contact_id)
     if contact:
         if name is not None:
@@ -48,6 +48,8 @@ def update_contact(contact_id, name=None, email=None, phone=None, address=None, 
             contact.email = email
         if phone is not None:
             contact.phone = phone
+        if website is not None:
+            contact.website = website
         if notes is not None:
             contact.notes = notes
         if is_store is not None:

@@ -550,25 +550,380 @@ body {
     cursor: pointer;
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
+/* Mobile Responsive Styles */
+@media (max-width: 1024px) {
+    .controls-area {
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
-    .contacts-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .contacts-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .add-contact-btn {
+    .left-controls {
         width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .sort-controls,
+    .filter-controls {
+        width: 100%;
+    }
+
+    .create-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 80px 12px 12px 12px;
+    }
+
+    .navbar-container {
+        height: 60px;
+        padding: 0 12px;
+    }
+
+    .navbar-logo {
+        font-size: 1.2em;
+    }
+
+    .navbar-menu {
+        gap: 5px;
+    }
+
+    .navbar-link {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 20px 12px;
+        border-radius: 10px;
+        margin: 0 auto;
+    }
+
+    .controls-area {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+    .left-controls {
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .search-controls {
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .sort-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sort-controls label {
+        font-size: 0.95em;
+    }
+
+    .sort-dropdown {
+        width: 100%;
+        padding: 12px 12px 12px 15px;
+        font-size: 16px;
+    }
+
+    .filter-controls {
+        width: 100%;
+    }
+
+    .toggle-label {
+        font-size: 0.95em;
+    }
+
+    .create-btn {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 16px;
     }
 
     .page-title {
         font-size: 1.8em;
+    }
+
+    .contacts-title {
+        font-size: 1.3em;
+    }
+
+    /* Table Mobile Styles */
+    .contacts-table {
+        font-size: 0.9em;
+    }
+
+    .contacts-table th {
+        padding: 12px 8px;
+        font-size: 0.8em;
+    }
+
+    .contacts-table td {
+        padding: 12px 8px;
+    }
+
+    .contact-name-cell {
+        font-weight: 600;
+        min-width: 120px;
+    }
+
+    .contact-email-cell,
+    .contact-phone-cell {
+        font-size: 0.9em;
+    }
+
+    .contact-actions-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        justify-content: flex-start;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        padding: 10px 12px;
+        font-size: 0.85em;
+        width: 100%;
+        text-align: center;
+    }
+
+    .edit-btn {
+        min-width: 0;
+    }
+
+    .delete-btn {
+        min-width: 0;
+    }
+
+    .no-contacts {
+        padding: 40px 20px;
+    }
+
+    .no-contacts p {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 70px 8px 8px 8px;
+    }
+
+    .navbar-container {
+        height: 55px;
+        padding: 0 8px;
+    }
+
+    .navbar-logo {
+        font-size: 1em;
+    }
+
+    .navbar-menu {
+        gap: 2px;
+    }
+
+    .navbar-link {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    .container {
+        padding: 16px 8px;
+    }
+
+    .controls-area {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        margin-bottom: 16px;
+    }
+
+    .left-controls {
+        width: 100%;
+        gap: 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 16px;
+        border-radius: 4px;
+    }
+
+    .sort-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sort-controls label {
+        font-size: 0.9em;
+    }
+
+    .sort-dropdown {
+        width: 100%;
+        padding: 10px 12px 10px 12px;
+        font-size: 14px;
+        background-position: right 8px center;
+        padding-right: 28px;
+    }
+
+    .filter-controls {
+        width: 100%;
+    }
+
+    .toggle-label {
+        font-size: 0.9em;
+        gap: 8px;
+    }
+
+    .toggle-slider {
+        width: 40px;
+        height: 22px;
+    }
+
+    .toggle-slider::before {
+        width: 16px;
+        height: 16px;
+    }
+
+    .toggle-checkbox:checked + .toggle-slider::before {
+        transform: translateX(18px);
+    }
+
+    .create-btn {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+
+    .page-title {
+        font-size: 1.5em;
+        margin-bottom: 8px;
+    }
+
+    .contacts-title {
+        font-size: 1.1em;
+    }
+
+    /* Horizontal Scroll for Table on Very Small Screens */
+    .contacts-list {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .contacts-table {
+        font-size: 0.85em;
+        min-width: 500px;
+    }
+
+    .contacts-table th {
+        padding: 10px 6px;
+        font-size: 0.75em;
+    }
+
+    .contacts-table td {
+        padding: 10px 6px;
+    }
+
+    .contact-name-cell {
+        font-weight: 600;
+        min-width: 100px;
+    }
+
+    .contact-email-cell,
+    .contact-phone-cell {
+        font-size: 0.85em;
+        white-space: nowrap;
+    }
+
+    .contact-actions-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        padding: 8px 10px;
+        font-size: 0.8em;
+        width: 100%;
+        min-width: 60px;
+    }
+
+    .contact-badge {
+        padding: 3px 8px;
+        font-size: 0.75em;
+    }
+
+    .empty {
+        font-size: 0.9em;
+    }
+
+    .no-contacts {
+        padding: 30px 16px;
+    }
+
+    .no-contacts p {
+        font-size: 0.95em;
+    }
+
+    /* Modal Mobile Styles */
+    #contactModal > div {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        border-radius: 12px;
+    }
+
+    #contactModal input[type="text"],
+    #contactModal input[type="email"],
+    #contactModal input[type="tel"],
+    #contactModal input[type="url"],
+    #contactModal textarea {
+        padding: 12px 10px;
+        font-size: 16px;
+    }
+
+    #contactModal input[type="text"],
+    #contactModal input[type="email"],
+    #contactModal input[type="tel"],
+    #contactModal input[type="url"] {
+        border-radius: 4px;
+    }
+
+    #contactModal textarea {
+        border-radius: 4px;
+        min-height: 100px;
+    }
+
+    #contactModal label {
+        font-size: 0.95em;
+    }
+
+    #contactModal button[type="submit"],
+    .modal-cancel-btn {
+        padding: 12px 16px;
+        font-size: 15px;
+        border-radius: 4px;
     }
 }

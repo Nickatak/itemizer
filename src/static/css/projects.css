@@ -464,51 +464,412 @@ h1 {
     font-size: 1.2em;
 }
 
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 15px;
+@media (max-width: 1024px) {
+    .container {
+        padding: 16px;
     }
 
     .controls-area {
-        flex-direction: row;
-        gap: 15px;
-        width: 100%;
-        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
     .left-controls {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .sort-controls,
+    .filter-controls {
+        width: 100%;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    h1 {
+        font-size: 2.2em;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 65px;
+    }
+
+    .navbar-container {
+        height: 60px;
+        padding: 0 12px;
+    }
+
+    .navbar-logo {
+        font-size: 1.2em;
+    }
+
+    .navbar-menu {
+        gap: 5px;
+    }
+
+    .navbar-link {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 12px;
+    }
+
+    .header {
         flex-direction: column;
-        gap: 15px;
-        flex: 1;
+        gap: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .controls-area {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+    .left-controls {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .sort-controls {
         width: 100%;
         flex-direction: column;
         gap: 8px;
+        align-items: flex-start;
+    }
+
+    .sort-controls label {
+        font-size: 0.95em;
+    }
+
+    .sort-dropdown {
+        width: 100%;
+        padding: 11px 12px 11px 12px;
+        font-size: 15px;
+        background-position: right 8px center;
+        padding-right: 32px;
     }
 
     .filter-controls {
         width: 100%;
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .toggle-label {
+        font-size: 0.95em;
         gap: 8px;
     }
 
+    .toggle-slider {
+        width: 42px;
+        height: 22px;
+    }
+
+    .toggle-slider::before {
+        width: 16px;
+        height: 16px;
+    }
+
+    .toggle-checkbox:checked + .toggle-slider::before {
+        transform: translateX(20px);
+    }
+
     .create-btn {
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
         flex-shrink: 0;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .project-card-container {
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .project-title {
+        font-size: 1.3em;
+        margin-bottom: 8px;
+    }
+
+    .project-description {
+        font-size: 0.95em;
+        margin-bottom: 12px;
+    }
+
+    .project-info {
+        font-size: 0.9em;
+        margin-bottom: 8px;
+    }
+
+    .project-meta {
+        font-size: 0.85em;
+        padding-top: 12px;
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        font-size: 0.85em;
+    }
+
+    .project-delete-btn {
+        width: 32px;
+        height: 32px;
+        top: 8px;
+        right: 8px;
+        opacity: 1;
+    }
+
+    .project-delete-btn.confirm-state {
+        opacity: 1;
+        top: 8px;
+        right: 8px;
+    }
+
+    .no-projects {
+        min-height: 300px;
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .navbar-container {
+        height: 55px;
+        padding: 0 8px;
+    }
+
+    .navbar-logo {
+        font-size: 1em;
+    }
+
+    .navbar-menu {
+        gap: 2px;
+    }
+
+    .navbar-link {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    .container {
+        padding: 8px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .controls-area {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+        margin-bottom: 16px;
+    }
+
+    .left-controls {
+        width: 100%;
+        gap: 8px;
+    }
+
+    .sort-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sort-controls label {
+        font-size: 0.9em;
+    }
+
+    .sort-dropdown {
+        width: 100%;
+        padding: 10px 10px 10px 10px;
+        font-size: 14px;
+        background-position: right 8px center;
+        padding-right: 28px;
+    }
+
+    .filter-controls {
+        width: 100%;
+    }
+
+    .toggle-label {
+        font-size: 0.9em;
+        gap: 8px;
+    }
+
+    .toggle-slider {
+        width: 40px;
+        height: 20px;
+    }
+
+    .toggle-slider::before {
+        width: 14px;
+        height: 14px;
+        top: 3px;
+        left: 3px;
+    }
+
+    .toggle-checkbox:checked + .toggle-slider::before {
+        transform: translateX(20px);
+    }
+
+    .toggle-text {
+        font-size: 0.9em;
+    }
+
+    .create-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+        margin-left: auto;
+    }
+
+    h1 {
+        font-size: 1.5em;
     }
 
     .projects-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    h1 {
-        font-size: 2em;
+    .project-card-wrapper {
+        position: relative;
+    }
+
+    .project-card-container {
+        padding: 14px;
+        border-radius: 8px;
+    }
+
+    .project-title {
+        font-size: 1.2em;
+        margin-bottom: 8px;
+    }
+
+    .project-description {
+        font-size: 0.9em;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .project-info {
+        font-size: 0.85em;
+        margin-bottom: 8px;
+    }
+
+    .project-meta {
+        font-size: 0.8em;
+        padding-top: 10px;
+        margin-top: auto;
+    }
+
+    .status-badge {
+        padding: 3px 8px;
+        font-size: 0.8em;
+        display: inline-block;
+    }
+
+    .project-delete-btn {
+        width: 28px;
+        height: 28px;
+        top: 6px;
+        right: 6px;
+        font-size: 16px;
+        opacity: 1;
+    }
+
+    .project-delete-btn:active {
+        transform: scale(0.9);
+    }
+
+    .project-delete-btn.confirm-state {
+        opacity: 1;
+        top: 6px;
+        right: 6px;
+        width: auto;
+        padding: 6px 6px;
+        font-size: 14px;
+    }
+
+    .confirm-buttons button {
+        padding: 3px 4px;
+    }
+
+    .project-card:hover {
+        transform: scale(1);
+    }
+
+    .project-card-container:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .no-projects {
+        min-height: 250px;
+        font-size: 1em;
+        padding: 20px;
+    }
+
+    /* Modal Mobile Styles */
+    #projectModal > div {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        border-radius: 10px;
+    }
+
+    #projectModal input[type="text"],
+    #projectModal input[type="date"],
+    #projectModal textarea,
+    #projectModal select {
+        padding: 11px 10px;
+        font-size: 16px;
+        border-radius: 4px;
+    }
+
+    #projectModal textarea {
+        min-height: 100px;
+    }
+
+    #projectModal label {
+        font-size: 0.95em;
+    }
+
+    #projectModal button[type="submit"],
+    #projectModal .modal-cancel-btn {
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    /* Adjust header inside modals */
+    #projectModal h2 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
     }
 }
